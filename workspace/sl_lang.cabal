@@ -1,0 +1,68 @@
+cabal-version:       3.0
+name:                sl-lang
+version:             1
+synopsis:            Compiler developed in the BCC328 course for the SL language.
+author:              Pedro Augusto Sousa Gonçalves, Gabriel Carlos Silva
+category:            Language
+build-type:          Simple
+
+library
+    exposed-modules:
+        Frontend.Lexer.Token
+        Frontend.Lexer.SL
+        Frontend.Parser.Syntax
+        Frontend.Parser.SL
+        Utils.Tree
+        Utils.Pretty
+
+    
+    build-tool-depends:
+        alex:alex, 
+        happy:happy 
+    
+    build-depends:
+      , array
+      , base
+      , containers
+      , filepath
+      , megaparsec
+      , mtl
+      , parser-combinators
+      , pretty
+      , process
+
+    hs-source-dirs:   src
+
+    default-language: Haskell2010
+
+executable sl
+    main-is:             Main.hs
+
+    build-depends:
+        , base
+        , sl-lang
+        , filepath
+        , process
+    
+    hs-source-dirs:      app
+
+    default-language:    Haskell2010
+
+test-suite sl-tests
+    main-is:             Main.hs
+
+    type:                exitcode-stdio-1.0
+
+    other-modules:
+        Lexer
+        Parser
+
+    build-depends:
+        , base
+        , sl-lang
+        , HUnit
+        , array
+    
+    hs-source-dirs:      test 
+
+    default-language:    Haskell2010

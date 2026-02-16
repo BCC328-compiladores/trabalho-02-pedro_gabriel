@@ -1,0 +1,23 @@
+
+
+Para executar o protótipo realizado, basta, em um ambiente linux com as dependências necessárias, executar a seguinte linha de comando:
+
+\begin{lstlisting}[mathescape=true, language=C]
+    cabal sl -- [OPTIONS] [FILE]
+\end{lstlisting}
+
+Sendo "[FILE]" o caminho do arquivo a ser processado, e "[OPTIONS]" parâmetros opcionais para a compilação, sendo eles:
+
+\begin{lstlisting}[mathescape=true, language=C]
+      -l,  --lexer  <file>
+      -pt, --parser <file>  
+      -pp, --pretty <file>    
+      -h, --help
+\end{lstlisting}
+
+\begin{itemize}
+    \item (--lexer) Executa o analisador léxico no arquivo especificado;
+    \item (--parser) Executa o analisador léxico e o parser no arquivo especificado, e imprime a ÁST; 
+    \item (--pretty) Executa o analisador léxico e o parser no arquivo especificado, e utiliza a biblioteca pretty para imprime uma versão textual do programa;
+    \item (-- help) Imprime uma mensagem explicando como executar o programa;
+\end{itemize}

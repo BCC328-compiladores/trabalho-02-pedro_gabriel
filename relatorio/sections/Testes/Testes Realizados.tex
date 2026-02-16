@@ -1,0 +1,65 @@
+A garantia de qualidade do compilador SL foi conduzida em duas etapas complementares. A primeira fase consistiu em uma validação manual e exploratória, fundamental para estabilizar a gramática inicial. Nesta etapa, utilizou-se os algoritmos de exemplo fornecidos na especificação do trabalho como entrada para o compilador.
+
+O processo de verificação envolveu a execução do analisador léxico e sintático e a inspeção visual de suas saídas. A lista de tokens gerada e, principalmente, a Árvore de Sintaxe Abstrata (AST) impressa no terminal foram meticulosamente comparadas com o código-fonte de entrada. Essa conferência manual permitiu assegurar que a estrutura hierárquica montada pelo parser correspondia fielmente à lógica dos programas originais, identificando erros de precedência e associações incorretas antes do desenvolvimento da suíte automatizada.
+
+Após a validação inicial, foi desenvolvida uma suíte de testes unitários automatizados utilizando a biblioteca \texttt{Test.HUnit} do Haskell. Esta abordagem permitiu o refinamento da implementação, isolando componentes específicos do compilador para validar regras de precedência, tratamento de erros e construções complexas da linguagem.
+
+\subsubsection{Testes do Analisador Léxico}
+
+Para a validação do Lexer, foi criado um módulo específico (\texttt{Lexer.hs}) focado em garantir que todos os tokens fossem reconhecidos corretamente antes de serem enviados ao parser. A função auxiliar \texttt{scanMany} foi implementada para consumir toda a entrada e retornar a lista de tokens ou um erro léxico.
+
+Os testes cobriram exaustivamente:
+\begin{itemize}
+    \item \textbf{Palavras-chave:} Verificação de todas as palavras reservadas, como \texttt{struct}, \texttt{forall}, \texttt{func}, entre outras.
+    \item \textbf{Literais:} Reconhecimento correto de inteiros, pontos flutuantes, strings, booleanos e identificadores.
+    \item \textbf{Operadores e Pontuação:} Testes de símbolos compostos (ex: \texttt{++}, \texttt{==}, \texttt{->}) para garantir que não houvesse ambiguidade com símbolos simples.
+\end{itemize}
+
+O código abaixo ilustra o teste de reconhecimento de palavras-chave:
+
+\begin{lstlisting}[language=Haskell]
+testKeywords :: Test
+testKeywords = TestCase $ do
+    let input = "struct forall func let return print if ..."
+    let expected = [TkStruct, TkForAll, TkFunc, TkLet, TkReturn, ...]
+    case scanMany input of
+        Right tokens -> assertEqual "All keywords must be recognized" 
+                        expected $ map tokenType tokens
+        Left e -> assertFailure e
+\end{lstlisting}
+
+\subsubsection{Testes do Analisador Sintático}
+
+A validação sintática, implementada no módulo \texttt{Parser.hs}, foi a etapa mais extensa. Para facilitar a depuração, foram criadas funções auxiliares como \texttt{parseStmt} e \texttt{parseExpr}, que encapsulam trechos de código dentro de uma função \texttt{main} fictícia, permitindo testar expressões e comandos isoladamente sem a necessidade de escrever um programa completo.
+
+Foram elaborados testes específicos para garantir que a árvore sintática (AST) respeitasse a ordem correta das operações matemáticas e lógicas, como a precedência da multiplicação sobre a adição e do \texttt{AND} sobre o \texttt{OR}.
+
+\begin{lstlisting}[language=Haskell]
+testPrecedence :: Test
+testPrecedence = TestCase $ do
+    -- Teste: 2 + 3 * a.b
+    -- Esperado: 2 + (3 * (a.b))
+    let codeMath = "2 + 3 * a.b"
+    let expMath  = LitInt 2 :+: (LitInt 3 :*: (Var "a" :.: "b"))
+
+    case parseExpr codeMath of
+        Right r1 -> assertEqual "Math Precedence (* over +)" expMath r1
+        err -> assertFailure $ "Error: " ++ show err
+\end{lstlisting}
+
+Um foco importante foi a validação de estruturas de dados compostas. O parser foi submetido a testes de acesso a campos de \textit{structs} aninhadas (ex: \texttt{person.address.city}) e, crucialmente, ao uso de matrizes multidimensionais (ex: \texttt{matrix[i][j]}), assegurando que a recursividade da gramática para \texttt{LValue} e \texttt{ArrayCreation} funcionasse conforme o esperado.
+
+\begin{lstlisting}[language=Haskell]
+testComplexAccess :: Test
+testComplexAccess = TestCase $ do
+    -- Teste: matrix[i][j]
+    let codeArray  = "matrix[i][j]"
+    -- AST: (matrix[i])[j]
+    let expArray   = (Var "matrix" :@: Var "i") :@: Var "j"
+
+    -- Teste: users[0].name
+    let codeMixed  = "users[0].name"
+    let expMixed   = (Var "users" :@: LitInt 0) :.: "name"
+\end{lstlisting}
+
+Essa abordagem híbrida, combinando a execução dos algoritmos de exemplo com testes unitários granulares, garantiu robustez ao analisador, cobrindo desde a detecção básica de tokens até a construção correta da AST em casos de alta complexidade sintática.

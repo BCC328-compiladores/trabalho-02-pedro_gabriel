@@ -1,0 +1,101 @@
+A gramática da linguagem SL define um programa como um conjunto de declarações globais, que podem corresponder a definições de funções ou de estruturas (structs). Essa organização reflete a natureza modular da linguagem, na qual funções e tipos compostos são definidos em nível global e utilizados ao longo do programa.
+
+Para facilitar a explicação a gramática foi dividida em subconjuntos de regras referentes ao objetivo em comum que aquele conjunto de regras possui.
+
+\subsubsection{Regras básicas:}
+Definem a estrutura global de um programa em SL. Um programa é composto por uma lista de declarações globais, representadas por DeclList. Essas declarações podem aparecer em sequência e são restritas a definições de estruturas e funções, não sendo permitidos comandos ou expressões isoladas no nível global.
+
+\begin{lstlisting}[mathescape=true, language=C]
+Main -> DeclList
+DeclList -> Decl DeclList | $\lambda$
+Decl -> StructDef | FuncDef
+\end{lstlisting}
+
+\subsubsection{Definição de estruturas:} 
+Uma estrutura é identificada por um nome e composta por um conjunto de campos, cada um associado a um tipo. A lista de campos pode conter zero ou mais declarações, permitindo estruturas vazias, e cada campo é definido por um identificador seguido de sua especificação de tipo.
+
+\begin{lstlisting}[mathescape=true, language=C]
+StructDef -> "struct" *ID* "{" FieldList "}"
+FieldList -> FieldDecl FieldList | $\lambda$
+FieldDecl -> *ID* ":" Type ";"
+\end{lstlisting}
+
+\subsubsection{Definição de função:}
+Esse conjunto de regras define a sintaxe de definição de funções na linguagem SL, incluindo suporte a parâmetros genéricos e inferência parcial de tipos. Uma função pode opcionalmente declarar variáveis de tipo por meio de uma cláusula "forall", permitindo a definição de funções polimórficas. Cada função é identificada por um nome, recebe uma lista possivelmente vazia de parâmetros — que podem ou não ter seus tipos explicitamente declarados — e pode especificar opcionalmente um tipo de retorno.
+
+
+\begin{lstlisting}[mathescape=true, language=C]
+FuncDef -> GenericsDecl "func" *ID* "(" ParamList ")" OptReturnType "{" Block "}"
+GenericsDecl -> "forall" IDlist "." | $\lambda$
+IDlist -> *ID* IDlist | *ID*
+ParamList -> Param "," ParamList | Param | $\lambda$
+Param -> *ID* ":" Type | *ID*
+OptReturnType -> ":" Type | $\lambda$
+\end{lstlisting}
+
+\subsubsection{Definição de tipos:}
+Esse conjunto de regras define o sistema sintático de tipos da linguagem SL. A gramática contempla tipos básicos, como inteiros, booleanos, strings, etc. Como também listas com ou sem tamanho explicitamente especificado, e tipos de função, permitindo a descrição de assinaturas funcionais com múltiplos parâmetros e tipo de retorno.
+
+\begin{lstlisting}[mathescape=true, language=C]
+Type -> BaseType | Type "[" "]" | Type "[" Expr "]" | "(" TypeList ")" "->" Type
+BaseType -> "int" | "float" | "string" | "bool" | "void" | *ID* |
+TypeList -> Type "," TypeList | Type | $\lambda$
+\end{lstlisting}
+\subsubsection{Definição de comandos:}
+Esse conjunto de regras define a sintaxe de comandos dentro de blocos de código na linguagem SL. Um bloco de código (Block) é composto por uma lista de instruções (StmtList), que podem ser variadas, incluindo declarações de variáveis (VarDecl), comandos de controle (if, while, for, e as estruturas "alternativas" como elif e else), chamadas de função (ReturnStmt), ou expressões simples (PrintStmt). 
+
+
+\begin{lstlisting}[mathescape=true, language=C]
+Block -> StmtList
+StmtList -> Stmt StmtList | $\lambda$
+Stmt -> VarDecl ";" | ReturnStmt ";" | PrintStmt ";" | Expr ";" | IfStmt | WhileStmt | ForStmt | Expr ";"
+VarDecl -> "let" *ID* ":" Type OptInit
+OptInit -> "=" Expr | $\lambda$ 
+ReturnStmt -> "return" Expr | "return" 
+PrintStmt -> "print" "(" Expr ")" 
+IfStmt -> "if" "(" Expr ")" "{" Block "}" OptElif 
+OptElif -> "elif" "(" Expr ")" "{" Block "}" OptElif | OptElse 
+OptElse -> "else" "{" Block "}" | $\lambda$ 
+WhileStmt -> "while" "(" Expr ")" "{" Block "}" 
+ForStmt -> "for" "(" Expr ";" Expr ";" Expr ")" "{" Block "}"
+\end{lstlisting}
+
+\subsubsection{Definições de expressões:}
+Esse conjunto de regras define a gramática de expressões da linguagem SL, organizando-as de forma hierárquica para garantir uma interpretação correta e não ambígua. A estrutura da gramática estabelece diferentes níveis de precedência, desde expressões de atribuição até expressões primárias, permitindo a combinação de operações aritméticas, relacionais e booleanas.
+
+A gramática suporta atribuições, operações lógicas (||, \&\&), comparações, operações aritméticas, operadores unários, além de expressões mais complexas como acesso a elementos de arranjos, acesso a campos de estruturas, chamadas de função, criação de objetos e criação dinâmica de arranjos. O conceito de LValue é utilizado para restringir o lado esquerdo de uma atribuição a expressões válidas, como variáveis, acessos a arranjos ou campos de estruturas.
+
+A definição recursiva das regras assegura a precedência e associatividade adequadas entre os operadores, evitando ambiguidades sintáticas. Além disso, a gramática permite expressões compostas e aninhadas, fornecendo uma base para a construção de programas complexos.
+
+
+
+\begin{lstlisting}[mathescape=true, language=C]
+Expr -> AssignExpr 
+AssignExpr -> LValue "=" OrExpr | OrExpr 
+OrExpr -> OrExpr "||" AndExpr | AndExpr 
+AndExpr -> AndExpr "&&" CompExpr | CompExpr 
+CompExpr ->  AddExpr CompOp AddExpr | AddExpr 
+AddExpr -> AddExpr AddOp MultiExpr | MultiExpr 
+MultiExpr -> MultiExpr MultiOp UnaryExpr | UnaryExpr 
+UnaryExpr -> "!" UnaryExpr | "-" UnaryExpr | PrimaryExpr 
+
+PrimaryExpr -> Literal | "[" ExprList "]" | LValue | FuncCall | ObjCreation | ArrayCreation | "(" Expr ")" | IncrementExpr | DecrementExpr
+LValue -> *ID* | LValue "[" Expr "]" | LValue "." *ID* 
+FuncCall -> *ID* "(" ExprList ")" 
+ExprList -> Expr "," ExprList | Expr | $\lambda$ 
+ObjCreation -> *ID* "{" ExprList "}" 
+ArrayCreation -> *new* Type DimList
+DimList -> "[" Expr "]" DimList | "[" Expr "]"
+IncrementExpr -> LValue "++" 
+DecrementExpr -> LValue "--"
+
+\end{lstlisting}
+\subsubsection{Terminais auxiliares:}
+São os operadores utilizados nas expressões.
+
+\begin{lstlisting}[mathescape=true, language=C]
+CompOp -> "==" | "!=" | "<" | "<=" | ">" | ">=" 
+AddOp -> "+" | "-" 
+MultiOp -> "*" | "/" 
+Literal -> *IntLit* | *FloatLit* | *StringLit* | *BoolLit*
+\end{lstlisting}

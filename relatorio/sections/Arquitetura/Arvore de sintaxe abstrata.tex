@@ -1,0 +1,99 @@
+A análise sintática é a fase responsável por verificar se a sequência de tokens produzida pelo analisador léxico obedece às regras gramaticais da linguagem SL. O resultado desse processo é a construção da Árvore de Sintaxe Abstrata (AST), uma estrutura de dados hierárquica que representa o programa livre de detalhes irrelevantes e pronta para as etapas de análise semântica e geração de código.
+
+A implementação utiliza a ferramenta \textit{Happy} para gerar o parser a partir de uma gramática livre de contexto, e define a estrutura da AST em Haskell utilizando Tipos de Dados Algébricos (ADTs).
+
+\subsection{Definição da Árvore de Sintaxe Abstrata (AST)}
+
+A estrutura da AST foi definida no módulo \texttt{Frontend.Parser.Syntax}. O nó raiz da árvore é o tipo \texttt{SL}, que encapsula uma lista de declarações globais.
+
+\begin{lstlisting}[language=haskell]
+data SL = SL [Decl] deriving (Eq, Ord, Show)
+
+data Decl
+    = Struct ID [Field]
+    | Func Generics ID [Param] (Maybe Type) Block
+    deriving (Eq, Ord, Show)
+\end{lstlisting}
+
+Essa estrutura permite que um programa na linguagem SL seja composto por múltiplas definições de estruturas (\texttt{struct}) e funções (\texttt{func}), suportando inclusive tipos genéricos e parâmetros opcionais de retorno.
+
+\subsection{Representação de Tipos}
+
+O sistema de tipos da linguagem é representado pelo ADT \texttt{Type}. Além dos tipos primitivos (\texttt{int}, \texttt{float}, \texttt{bool}, etc.), a AST suporta tipos complexos recursivos, como arrays e funções (funções de primeira classe).
+
+Note que a definição de \texttt{TyArray} permite armazenar uma expressão opcional para o tamanho, o que é crucial para validações semânticas futuras sobre o tamanho do vetor.
+
+\begin{lstlisting}[language=haskell]
+data Type 
+    = TyInt | TyFloat | TyString | TyBool | TyVoid 
+    | TyID ID 
+    | TyArray Type (Maybe Expr)
+    | TyFunc [Type] Type
+    deriving (Eq, Ord, Show)
+\end{lstlisting}
+
+\subsection{Comandos e Fluxo de Controle}
+
+Os comandos são representados pelo tipo \texttt{Stmt}. A estrutura reflete fielmente a gramática, onde blocos de controle como \texttt{if}, \texttt{while} e \texttt{for} encapsulam expressões de condição e blocos de execução.
+
+Destaque para a estrutura do \texttt{IF}, que foi modelada para suportar uma lista de cláusulas \texttt{elif} e um bloco \texttt{else} opcional, facilitando a geração de código linearizada posteriormente.
+
+\begin{lstlisting}[language=haskell]
+data Stmt 
+    = VarDecl ID (Maybe Type) (Maybe Expr) 
+    | Return (Maybe Expr)
+    | Print Expr
+    | IF Expr Block [(Expr, Block)] (Maybe Block)
+    | While Expr Block
+    | For Expr Expr Expr Block
+    | Exp Expr
+    deriving (Eq, Ord, Show)
+\end{lstlisting}
+
+\subsection{Expressões e Precedência}
+
+As expressões (\texttt{Expr}) formam o núcleo da lógica computacional. Elas são definidas recursivamente para suportar operações aritméticas, lógicas, relacionais e acessos a memória.
+
+Para garantir a precedência correta dos operadores (por exemplo, multiplicação antes de adição), a AST utiliza construtores infixos e o arquivo de gramática (\texttt{SL.y}) define as prioridades explicitamente através das diretivas \texttt{\%left}, \texttt{\%right} e \texttt{\%nonassoc}.
+
+\begin{lstlisting}[language=haskell]
+data Expr
+    = Expr := Expr      
+    | Expr :||: Expr    
+    | Expr :&&: Expr    
+    | Expr :+: Expr    
+    | Expr :*: Expr     
+    
+    | Expr :.: ID       
+    | Expr :@: Expr     
+    | FuncCall ID [Expr]
+    | NewArray Type [Expr]
+    -- ... (outros construtores)
+    deriving (Eq, Ord, Show)
+
+-- Ordem de Precedencia
+infixr 1 :=
+infixl 2 :||:
+infixl 3 :&&:
+infix  4 :==:, :!=:, :<:, :<=:, :>:, :>=:
+infixl 6 :+:, :-:
+infixl 7 :*:, :/:
+infixl 8 :.:, :@:
+\end{lstlisting}
+
+\subsection{Especificação da Gramática (Happy)}
+
+O analisador sintático foi gerado a partir do arquivo \texttt{Frontend.Parser.SL}. Ele foi configurado para operar dentro da Mônada \texttt{Alex}, permitindo uma comunicação direta e eficiente com o analisador léxico para controle de estado e posição (linha/coluna) em caso de erros.
+
+A gramática resolve ambiguidades clássicas, como o problema do \textit{dangling else} e conflitos em declarações de array, através de regras de precedência. Um exemplo é a regra de criação de arrays, que utiliza \texttt{DimList} e precedência contextual (\texttt{\%prec LOW}) para diferenciar corretamente entre a criação de matrizes e acessos subsequentes.
+
+\begin{lstlisting}[language=haskell]
+ArrayCreation :: { Expr }
+    : new BaseType DimList  { NewArray $2 $3 }
+
+DimList :: { [Expr] }
+    : '[' Expr ']' DimList         { $2 : $4 }
+    | '[' Expr ']' %prec LOW       { [$2] }
+\end{lstlisting}
+
+A função de tratamento de erro (\texttt{parseError}) utiliza as informações de posição fornecidas pelo lexer para indicar exatamente onde a análise falhou, melhorando a experiência de depuração para o programador da linguagem SL.

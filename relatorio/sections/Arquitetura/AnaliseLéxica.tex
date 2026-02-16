@@ -1,0 +1,63 @@
+A análise léxica do compilador da linguagem SL é responsável por transformar o código-fonte em uma sequência de tokens, que representam as unidades léxicas fundamentais da linguagem. Essa etapa abstrai o fluxo de caracteres de entrada e fornece ao analisador sintático uma representação estruturada, contendo informações sobre o tipo do token e sua posição no código-fonte.
+
+O analisador léxico foi implementado utilizando a ferramenta Alex, por meio do arquivo SL.x, que define os padrões léxicos da linguagem com base em expressões regulares. Cada padrão reconhecido é convertido em um token correspondente, conforme definido no módulo Token.hs.
+
+\subsubsection{Estrutura de Tokens:}
+
+Cada token é representado por um registro associado a uma lexema à sua posição no código fonte, permitindo  a emissão de mensagens de erro nas fases posteriores do compilador:
+
+\begin{lstlisting}[language=haskell]
+data Token = Token {
+    pos :: (Int, Int),
+    lexeme :: Lexeme
+} deriving (Eq, Ord, Show)
+\end{lstlisting}
+
+O tipo Lexeme define todas as categorias léxicas da linguagem SL, incluindo literais, identificadores, delimitadores, operadores e palavras-chave.
+
+\subsubsection{Literais e Identificadores:}
+
+A gramática léxica contempla literais inteiros, de ponto flutuante, booleanos e strings, além de identificadores genéricos:
+
+
+\begin{lstlisting}[language=haskell]
+= TkIntLit Int
+| TkFloatLit Float
+| TkStringLit String
+| TkBoolLit Bool
+| TkID { out :: String }
+[...]
+
+\end{lstlisting}
+
+\subsubsection{Operadores, Delimitadores e Palavras-chave:}
+
+O analisador léxico reconhece operadores aritméticos, relacionais e booleanos, bem como símbolos de pontuação e delimitadores na sintaxe da linguagem:
+
+\begin{lstlisting}[language=haskell]
+[...]
+    | TkLParen                  -- "("
+    | TkRParen                  -- ")"
+    | TkLBracket                -- "["
+    | TkRBracket                -- "]"
+    | TkLBrace                  -- "{"
+    | TkRBrace                  -- "}"
+[...]
+    | TkAdd                     -- "+"
+    | TkSub                     -- "-"
+    | TkMul                     -- "*"
+    | TkDiv                     -- "/"
+[...]
+\end{lstlisting}
+
+Além disso, palavras-chave como func, struct, if, while, for, return e new são mapeadas para lexemas próprios, evitando ambiguidades na análise sintática.
+
+\begin{lstlisting}[language=haskell]
+[...]
+    | TkIF
+    | TkElif
+    | TkElse
+    | TkWhile
+    | TkFor
+[...]
+\end{lstlisting}

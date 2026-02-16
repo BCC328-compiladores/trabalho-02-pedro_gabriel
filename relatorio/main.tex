@@ -1,0 +1,127 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\geometry{a4paper, left=3cm, right=2cm, top=3cm, bottom=2cm}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\title{Relatório de Projeto: Compilador SL}
+\author{
+  Pedro Augusto Sousa Gonçalves \\
+  \small{Matrícula: 21.1.4015}
+  \and
+  Gabriel Carlos Silva \\
+  \small{Matrícula: 23.1.4016}
+}
+
+\date{
+    BCC328 - Construção de Compiladores I \\
+    DECOM - UFOP \\
+    \today
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Este trabalho apresenta o desenvolvimento das etapas de análise léxica e sintática de um compilador para a linguagem \textit{SL}. O projeto foi desenvolvido como requisito parcial da disciplina de Construção de Compiladores I. A implementação utilizou a linguagem de programação \texttt{Haskell} em conjunto com as ferramentas geradoras \texttt{Alex} e \textit{Happy}. O analisador resultante é capaz de identificar tokens válidos e verificar a conformidade do código fonte com a gramática livre de contexto especificada, reportando erros léxicos e sintáticos quando encontrados.
+\end{abstract}
+
+\clearpage\newpage
+\tableofcontents
+\clearpage\newpage
+
+\section{Introdução}
+\input{sections/intro.tex}
+\clearpage\newpage
+
+
+
+\section{Metodologia}
+\subsection{Estrutura sintática de SL}
+\input{sections/Metodologia/Estrutura sintática}
+
+\subsection{Sistema de tipos para SL}
+\input{sections/Metodologia/Sistemas de tipos}
+
+\subsection{Inferência de tipos para SL}
+\input{sections/Metodologia/Inferência de tipos}
+
+\subsection{Semântica operacional para SL}
+\input{sections/Metodologia/Semantica}
+
+\clearpage\newpage
+
+\section{Arquitetura do Compilador}
+
+\subsection{Gramatica do SL}
+\input{sections/Arquitetura/Gramatica}
+
+\subsection{Análise léxica}
+\input{sections/Arquitetura/AnaliseLéxica}
+
+\subsection{Análise Sintática}
+\input{sections/Arquitetura/Arvore de sintaxe abstrata}
+
+\section{Resultados e Discussão}
+
+\subsection{Instruções de Uso}
+\input{sections/Testes/Insturuções}
+
+\subsection{Testes Realizados}
+\input{sections/Testes/Testes Realizados}
+
+\subsection{Limitações}
+\input{sections/Testes/Limitações}
+
+\section{Conclusão}
+\input{sections/Conclusão}
+
+\section{Referências}
+
+\begin{thebibliography}{9}
+\bibitem{hutton2016}
+Hutton, G. (2016). \emph{Programming in Haskell}. Cambridge University Press.
+
+\bibitem{appel1998}
+Appel, A. W. (1998). \emph{Modern Compiler Implementation in ML}. Cambridge University Press.
+
+\bibitem{webassembly2023}
+WebAssembly Community Group. (2023). \emph{WebAssembly Specification}.
+\end{thebibliography}
+
+\end{document}

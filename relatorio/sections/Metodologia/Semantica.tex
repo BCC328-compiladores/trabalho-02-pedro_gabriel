@@ -1,0 +1,53 @@
+A semântica operacional da linguagem SL descreve formalmente o comportamento dos programas durante sua execução, especificando como cada construção sintática afeta o estado do programa. Esse estado pode ser compreendido, de forma abstrata, como a combinação de um ambiente de variáveis, uma pilha de chamadas de função e uma memória responsável pelo armazenamento de valores, incluindo arranjos e registros.
+
+A execução de comandos em SL ocorre de maneira sequencial, seguindo as regras usuais de linguagens imperativas. Por exemplo, em uma atribuição, a expressão do lado direito é avaliada antes de seu valor ser associado à variável do lado esquerdo:
+
+\begin{lstlisting}[numbers=none, language=C]
+let x : int = 10;
+x = x + 1;
+\end{lstlisting}
+
+Nesse caso, a expressão x + 1 é avaliada no estado atual do programa, resultando no valor 11, que é então atribuído à variável x, atualizando o ambiente de execução.
+
+Expressões aritméticas, relacionais e booleanas são avaliadas de forma determinística, respeitando a precedência e associatividade definidas na gramática da linguagem. Considere o exemplo:
+
+\begin{lstlisting}[numbers=none, language=C]
+let result : bool = (3 + 2 * 4) > 10 && true;
+\end{lstlisting}
+
+A avaliação ocorre em etapas, primeiro resolvendo a multiplicação, seguida da soma, da comparação relacional e, por fim, da operação booleana, resultando no valor "true".
+
+Estruturas de controle alteram o fluxo de execução com base na avaliação de expressões booleanas. No comando condicional if-else, apenas o bloco associado à condição verdadeira é executado:
+
+\begin{lstlisting}[numbers=none, language=C]
+if (x > 0) {
+    print("positivo");
+} else {
+    print("nao positivo");
+}
+
+\end{lstlisting}
+
+A escolha do bloco a ser executado depende exclusivamente do valor da expressão x > 0 no momento da avaliação.
+
+Laços de repetição, como while, são executados enquanto a condição associada for verdadeira, produzindo múltiplas transições de estado:
+
+\begin{lstlisting}[numbers=none, language=C]
+let i : int = 0;
+while (i < 3) {
+    print(i);
+    i = i + 1;
+}
+\end{lstlisting}
+
+Nesse exemplo, o corpo do laço é executado três vezes, com a variável i sendo atualizada a cada iteração até que a condição i < 3 se torne falsa.
+
+A chamada de funções em SL envolve a criação de um novo ambiente local, no qual os parâmetros formais são associados aos valores dos argumentos passados. Considere a função:
+
+\begin{lstlisting}[numbers=none, language=C]
+func inc(x : int) : int {
+    return x + 1;
+}
+\end{lstlisting}
+
+Ao executar a chamada inc(5), o valor 5 é associado ao parâmetro x em um novo ambiente, a expressão x + 1 é avaliada nesse contexto, e o valor 6 é retornado ao ponto de chamada, onde o ambiente local da função é então descartado.
