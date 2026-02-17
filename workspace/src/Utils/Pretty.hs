@@ -78,7 +78,10 @@ instance Pretty Stmt where
     
     pp (Print expr) = 
         text "print" <> text "(" <> pp  expr <> text ")" <> text ";"
-    
+
+    pp (Scan expr) = 
+        text "scan" <> text "(" <> pp  expr <> text ")" <> text ";"    
+
     pp (IF cond block elifs elseBlock) = 
         text "if" <+> text "(" <> pp  cond <> text ")" <+> text "{" $$
         nest 4 (pp block) $$

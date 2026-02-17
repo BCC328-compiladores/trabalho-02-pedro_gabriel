@@ -169,7 +169,7 @@ testLoops = TestCase $ do
             assertEqual "For Parsing"   expFor   rF
         err -> assertFailure $ "Error in Loops: " ++ show err
 
--- Return, Print, Exp
+-- Return, Print, Scan, Exp
 testOthers :: Test
 testOthers = TestCase $ do
     -- Return empty and with value
@@ -179,6 +179,10 @@ testOthers = TestCase $ do
     -- Print
     let codePrint = "print(\"Hello\");"
     let expPrint  = [Print (LitString "Hello")]
+    
+    -- Scan
+    let codePrint = "scan(a);"
+    let expPrint  = [Scan (Var "a")]
     
     -- Isolated Exp (Function call)
     let codeExp = "doSomething();"
