@@ -36,6 +36,7 @@ tokens:-
       <0> "let"                      { simpleToken TkLet }
       <0> "return"                   { simpleToken TkReturn }
       <0> "print"                    { simpleToken TkPrint }
+      <0> "scan"                     { simpleToken TkScan }
       <0> "if"                       { simpleToken TkIF }
       <0> "elif"                     { simpleToken TkElif }
       <0> "else"                     { simpleToken TkElse }

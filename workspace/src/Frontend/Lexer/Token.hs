@@ -49,6 +49,7 @@ data Lexeme
     | TkLet
     | TkReturn
     | TkPrint
+    | TkScan
     | TkIF
     | TkElif
     | TkElse
