@@ -19,6 +19,7 @@ import Frontend.Parser.Syntax
     let         { Token _ TkLet }
     return      { Token _ TkReturn }
     print       { Token _ TkPrint }
+    scan        { Token _ TkScan }
     if          { Token _ TkIF }
     elif        { Token _ TkElif }
     else        { Token _ TkElse }
@@ -174,6 +175,7 @@ Stmt :: { Stmt }
 
     | return OptExpr ';'             { Return $2 } -- return
     | print '(' Expr ')' ';'         { Print $3 }  -- print
+    | scan  '(' Expr ')' ';'         { Scan $3 }   -- scan
     | IfStmt                         { $1 }        -- if
     | WhileStmt                      { $1 }        -- while
     | ForStmt                        { $1 }        -- for 

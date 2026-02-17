@@ -33,6 +33,7 @@ data Stmt
     = VarDecl ID (Maybe Type) (Maybe Expr) -- Type/Init are optional for inference
     | Return (Maybe Expr)
     | Print Expr
+    | Scan Expr
     | IF Expr Block [(Expr, Block)] (Maybe Block) -- [(Expr, Block)]: Elif, (Maybe Block): Else
     | While Expr Block
     | For Expr Expr Expr Block
