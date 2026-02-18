@@ -40,7 +40,7 @@ tychBinOp ctx e1 e2 opType resType =
 
 tychArith :: Ctx -> Expr -> Expr -> Check Type
 tychArith ctx e1 e2 =
-    case bothCheck (tcExp ctx e1) (tcExp ctx e2) of
+    case bothCheck (tychExpr ctx e1) (tychExpr ctx e2) of
         Left errs      -> Left errs
         Right (t1, t2) ->
             case (requireNumeric t1, requireNumeric t2) of
@@ -88,8 +88,8 @@ tychExpr ctx (lhs := rhs) = do
     return tl
 
 -- Logical 
-tychExpr ctx (e1 :||: e2) = tychBinOp ctx e1 e2 tyBool TyBool
-tychExpr ctx (e1 :&&: e2) = tychBinOp ctx e1 e2 tyBool TyBool
+tychExpr ctx (e1 :||: e2) = tychBinOp ctx e1 e2 TyBool TyBool
+tychExpr ctx (e1 :&&: e2) = tychBinOp ctx e1 e2 TyBool TyBool
 
 -- Igualdade
 tychExpr ctx (e1 :==: e2) =
@@ -146,10 +146,57 @@ tychExpr ctx (e :.: field) = do
         _ -> notAStruct t
 
 -- Acesso ao array
+tychExpr ctx (arr :@: idx) = do
+    ta <- tychExpr ctx arr
+    ti <- tychExpr ctx idx
+    case ti of
+        TyInt -> return ()
+        _     -> typeError TyInt ti >> return ()
+    case ta of
+        TyArray elemTy _    -> return elemTy
+        _                   -> notAnArray ta
+
 -- Chamada da função
+tychExpr ctx (FuncCall fexpr args) = do
+    tf <- tychExpr ctx fexpr
+    case tf of 
+        TyFunc paramTys retTy -> do
+            let nExpected = length paramTys
+                nFound    = length args
+            if nExpected /= nFound
+                then arityMismatch "<lambda>" nExpected nFound
+                else do
+                    argTys <- mapM (tychExpr ctx) args
+                    sequence_ (zipWith requireEqual paramTys argTys)
+                    return retTy
+        _ -> notCallable tf
+
 
 -- Construção da estrutura
+tychExpr ctx (NewObj sname args) = do
+    case M.lookup sname (structCtx ctx) of
+        Nothing -> undefinedStruct sname
+        Just fields -> do
+            let fieldTys = M.elems fields
+                nExp    = length fieldTys
+                nFound  = length args
+            if nExp /= nFound
+                then arityMismatch sname nExp nFound
+                else do
+                    argTys <- mapM (tychExpr ctx) args
+                    sequence_ (zipWith requireEqual fieldTys argTys)
+                    return (TyStruct sname)
 
--- Construção do array
+
+-- Construção do array (Verifica se as dimensões são inteiros)
+tychExpr ctx (NewArray elemTy dimExprs) = do
+    mapM_ (\d -> tychExpr ctx d >>= requireEqual TyInt) dimExprs
+    return (TyArray elemTy Nothing)
 
 -- LValue Checker
+tychLValue :: Ctx -> Expr -> Check Type
+tychLValue ctx (Var v)          = lookupVar ctx v
+tychLValue ctx (e :.: field)    = tychExpr ctx (e :.: field) 
+tychLValue ctx (arr :@: idx)    = tychExpr ctx (arr :@: idx)
+tychLValue ctx (Paren e)        = tychLValue ctx e
+tychLValue _ e                  = Left [NotAssignable e]
