@@ -30,6 +30,8 @@ tokens:-
       <state_comment> \n             ;
 
       -- Keywords
+      <0> "continue"                 { simpleToken TkContinue }
+      <0> "break"                    { simpleToken TkBreak }
       <0> "struct"                   { simpleToken TkStruct }
       <0> "forall"                   { simpleToken TkForAll }
       <0> "func"                     { simpleToken TkFunc }

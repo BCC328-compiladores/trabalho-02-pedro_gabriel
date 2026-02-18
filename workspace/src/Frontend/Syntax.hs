@@ -48,6 +48,8 @@ data Stmt
     | Print Expr
     | Scan Expr
     | IF Expr Block [(Expr, Block)] (Maybe Block) -- [(Expr, Block)]: Elif, (Maybe Block): Else
+    | Continue
+    | Break
     | While Expr Block
     | For Expr Expr Expr Block
     | Exp Expr  -- Isolated expression
@@ -177,4 +179,5 @@ checkType (TyStruct id1) (ValStruct id2 _) = id1 == id2
 checkType (TyStruct _) ValVoid             = True 
 checkType (TyArray t1 _) (ValArray t2 _)   = t1 == t2
 checkType (TyArray _ _) ValVoid            = True
+checkType (TyVar _) _                      = True
 checkType _ _                              = False

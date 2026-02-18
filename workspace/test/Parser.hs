@@ -153,15 +153,15 @@ testIfElse = TestCase $ do
 testLoops :: Test
 testLoops = TestCase $ do
     -- While
-    let codeWhile = "while(true) { x++; }"
-    let expWhile  = [While (LitBool True) (Block [Exp (PostInc (Var "x"))])]
+    let codeWhile = "while(true) { x++; break; }"
+    let expWhile  = [While (LitBool True) (Block [Exp (PostInc (Var "x")), Break])]
     
     -- For
-    let codeFor   = "for(i=0; i<10; i++) { print(i); }"
+    let codeFor   = "for(i=0; i<10; i++) { print(i); continue; }"
     let init      = Var "i" := LitInt 0
     let cond      = Var "i" :<: LitInt 10
     let step      = PostInc (Var "i")
-    let blockFor  = Block [Print (Var "i")]
+    let blockFor  = Block [Print (Var "i"), Continue]
     let expFor    = [For init cond step blockFor]
 
     case (parseStmt codeWhile, parseStmt codeFor) of

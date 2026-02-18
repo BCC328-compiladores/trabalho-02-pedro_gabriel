@@ -59,6 +59,10 @@ instance ToTree Stmt where
 
     toTree (Scan expr) = Node "Scan" [toTree expr]
 
+    toTree Continue = Node "Continue" []
+     
+    toTree Break = Node "Break" []
+
     toTree (IF cond block elifs elseBlock) =
         Node "If" $ [toTree cond, toTree block] ++                    -- If
             map elifToTree elifs ++                                   -- Elif 

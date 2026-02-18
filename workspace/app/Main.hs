@@ -117,6 +117,8 @@ runLexer file = do
                         TkNot           -> "!"
 
                         -- Reserved Lexemes
+                        TkContinue      -> "continue"
+                        TkBreak         -> "break"
                         TkStruct        -> "struct"
                         TkForAll        -> "forall"
                         TkFunc          -> "func"

@@ -43,6 +43,8 @@ data Lexeme
     | TkOr                      -- "||"
     | TkNot                     -- "!"
     -- Keywords Lexemes
+    | TkContinue
+    | TkBreak
     | TkStruct
     | TkForAll
     | TkFunc

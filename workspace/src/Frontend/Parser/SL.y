@@ -14,6 +14,8 @@ import Frontend.Syntax
 
 %token 
     struct      { Token _ TkStruct }
+    continue    { Token _ TkContinue }
+    break       { Token _ TkBreak }
     forall      { Token _ TkForAll }
     func        { Token _ TkFunc }
     let         { Token _ TkLet }
@@ -177,6 +179,8 @@ Stmt :: { Stmt }
     | print '(' Expr ')' ';'         { Print $3 }  -- print
     | scan  '(' Expr ')' ';'         { Scan $3 }   -- scan
     | IfStmt                         { $1 }        -- if
+    | continue ';'                   { Continue }  
+    | break ';'                      { Break }
     | WhileStmt                      { $1 }        -- while
     | ForStmt                        { $1 }        -- for 
     | Expr ';'                       { Exp $1 }    -- isolated expression 
