@@ -108,7 +108,7 @@ instance ToTree Expr where
     toTree (e :.: id) = Node ("Field (." ++ id ++ ")") [toTree e] -- Struct Field Access
     toTree (e1 :@: e2) = Node "Array ([])" [toTree e1, toTree e2] -- Array Position Access
 
-    toTree (FuncCall id args) = Node ("Call: " ++ id) $ map toTree args
+    toTree (FuncCall expr args) = Node "Call" (toTree expr : map toTree args)
     toTree (NewObj id fields) = Node ("New Obj: " ++ id) $ map toTree fields
     toTree (NewArray type_ dims) = Node "New Array" $ toTree type_ : map toTree dims
 

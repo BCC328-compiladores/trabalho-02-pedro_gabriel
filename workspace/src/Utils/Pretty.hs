@@ -24,9 +24,12 @@ instance Pretty Type where
     pp TyString = text "string"
     pp TyBool = text "bool"
     pp TyVoid = text "void"
-    pp (TyID id) = text id
-    pp (TyArray t size) = pp t <> text "[" <> maybe empty pp size <> text "]"
-    pp (TyFunc args ret) = text "(" <> hsep (punctuate (text ",") (map pp args)) <> text ")" <+> text "->" <+> pp ret
+    pp (TyStruct id) = text id
+    pp (TyVar id) = text id
+    pp (TyArray t Nothing) = pp t <> text "[]"
+    pp (TyArray t (Just e)) = pp t <> text "[" <> pp e <> text "]" 
+    pp (TyFunc args ret) = 
+        text "(" <> hsep (punctuate (text ",") (map pp args)) <> text ")" <+> text "->" <+> pp ret
 
 -- Decl (Struct / Func)
 
@@ -143,7 +146,7 @@ instance Pretty Expr where
     pp (e :.: id) = pp e <> text "." <> text id             -- Struct Field Access
     pp (e1 :@: e2) = pp e1 <> text "[" <> pp e2 <> text "]" -- Array Position Access
     
-    pp (FuncCall id args) = text id <> text "(" <> hsep (punctuate comma (map pp args)) <> text ")"
+    pp (FuncCall expr args) = pp expr <> text "(" <> hsep (punctuate comma (map pp args)) <> text ")"
     pp (NewObj id args) = text id <> text "{" <> hsep (punctuate comma (map pp args)) <> text "}"
     pp (NewArray t dims) = text "new" <+> pp t <> hcat (map (\d -> text "[" <> pp d <> text "]") dims)
     

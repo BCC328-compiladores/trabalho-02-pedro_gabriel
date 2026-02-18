@@ -447,7 +447,7 @@ happyReduce_31 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> H
 happyReduce_31 = happySpecReduce_1  13# happyReduction_31
 happyReduction_31 (HappyTerminal (Token _ (TkID happy_var_1)))
          =  HappyAbsSyn17
-                 (TyID happy_var_1
+                 (TyStruct happy_var_1
         )
 happyReduction_31 _  = notHappyAtAll 
 
@@ -956,7 +956,7 @@ happyReduction_83 (_ `HappyStk`
         (HappyTerminal (Token _ (TkID happy_var_1))) `HappyStk`
         happyRest)
          = HappyAbsSyn29
-                 (FuncCall happy_var_1 happy_var_3
+                 (FuncCall (Var happy_var_1) happy_var_3
         ) `HappyStk` happyRest
 
 happyReduce_84 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )

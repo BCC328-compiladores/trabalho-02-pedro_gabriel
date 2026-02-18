@@ -49,8 +49,9 @@ testFuncGenerics = TestCase $ do
     let code = "forall T . func generic(x:(T)->T):T{}"
     
     let gen = Generics (Just ["T"])
-    let params = [Param "x" $ Just $ TyFunc [TyID "T"] $ TyID "T"]
-    let ret = Just (TyID "T")
+    let tType = TyStruct "T" 
+    let params = [Param "x" $ Just $ TyFunc [tType] tType]
+    let ret = Just tType
     
     let expected = SL [Func gen "generic" params ret (Block [])]
     
@@ -181,12 +182,12 @@ testOthers = TestCase $ do
     let expPrint  = [Print (LitString "Hello")]
     
     -- Scan
-    let codePrint = "scan(a);"
-    let expPrint  = [Scan (Var "a")]
+    let codeScan = "scan(a);"
+    let expScan  = [Scan (Var "a")]
     
     -- Isolated Exp (Function call)
     let codeExp = "doSomething();"
-    let expExp  = [Exp (FuncCall "doSomething" [])]
+    let expExp  = [Exp (FuncCall (Var "doSomething") [])]
 
     case parseStmt (codeRet ++ codePrint ++ codeExp) of
         Right stmts -> assertEqual "Other Stmts" (expRet ++ expPrint ++ expExp) stmts
@@ -286,7 +287,7 @@ testCreations :: Test
 testCreations = TestCase $ do
     -- Function Call
     let codeCall = "sum(a, 10)"
-    let expCall  = FuncCall "sum" [Var "a", LitInt 10]
+    let expCall  = FuncCall (Var "sum") [Var "a", LitInt 10]
 
     -- Object Creation
     let codeObj  = "Point { 10, 20 }"

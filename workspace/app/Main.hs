@@ -123,6 +123,7 @@ runLexer file = do
                         TkLet           -> "let"
                         TkReturn        -> "return"
                         TkPrint         -> "print"
+                        TkScan          -> "scan"
                         TkIF            -> "if"
                         TkElif          -> "elif"
                         TkElse          -> "else"

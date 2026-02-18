@@ -139,8 +139,8 @@ OptReturnType :: { Maybe Type }
 Type :: { Type }
     : BaseType                   { $1 }
     | Type '[' ']'               { TyArray $1 Nothing }
-    | Type '[' Expr ']'          { TyArray $1 (Just $3) }
-    | '(' TypeList ')' '->' Type { TyFunc $2 $5 } -- a func can be a First-Class Citizen (This might fuck this project in the next stages)
+    | Type '[' Expr ']'          { TyArray $1 (Just $3)  }
+    | '(' TypeList ')' '->' Type { TyFunc $2 $5 } 
 
 -- BaseType is a helper rule for Array Creation to avoid shift reduce error 
 -- (distinguishes between recursive 'Type[]' and the 'DimList' in 'new int[10]')
@@ -151,7 +151,7 @@ BaseType :: { Type }
     | string                     { TyString }
     | bool                       { TyBool }
     | void                       { TyVoid }
-    | id                         { TyID $1 }
+    | id                         { TyStruct $1 }
 
 TypeList :: { [Type] }
     : Type ',' TypeList { $1 : $3 }
@@ -257,7 +257,7 @@ LValue :: { Expr }
     | Expr '[' Expr ']'             { $1 :@: $3 }    -- Array Position Access
 
 FuncCall :: { Expr }
-    : id '(' ExprList ')'           { FuncCall $1 $3 }
+    : id '(' ExprList ')'           { FuncCall (Var $1) $3 }
 
 ObjCreation :: { Expr }
     : id '{' ExprList '}'           { NewObj $1 $3 }

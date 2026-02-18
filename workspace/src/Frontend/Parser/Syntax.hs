@@ -1,17 +1,26 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use newtype instead of data" #-}
 module Frontend.Parser.Syntax where
+
+import Data.IORef
+import qualified Data.Map as M
 
 -- ID to Var, Func, and Struct
 type ID = String
 
 data Type 
+    -- Base Types --
     = TyInt
     | TyFloat 
     | TyString 
     | TyBool 
-    | TyVoid 
-    | TyID ID 
-    | TyArray Type (Maybe Expr) -- Array type with optional size
-    | TyFunc [Type] Type  -- a func can be a First-Class Citizen (This might fuck this project in the next stages)
+    | TyVoid
+    -- Composite types -- 
+    | TyArray Type (Maybe Expr)
+    | TyStruct ID
+    | TyFunc [Type] Type
+    -- Generic type for inference --
+    | TyVar ID
     deriving (Eq, Ord, Show)
 
 -- Main , Struct and Func
@@ -73,19 +82,40 @@ data Expr
     | Expr :.: ID  -- Structs Field Access
     | Expr :@: Expr  -- Arrays Position Access
 
-    | FuncCall ID [Expr]
+    | FuncCall Expr [Expr]
     | NewObj ID [Expr] 
     | NewArray Type [Expr]
-
+    
     | LitInt Int
     | LitFloat Float
     | LitString String
     | LitBool Bool
-    | LitArray [Expr] -- Array literal
+    | LitArray [Expr]
 
     | Paren Expr -- Preserves explicit parentheses
     
     deriving (Eq, Ord, Show)
+
+-- Value definition
+data Value
+    = ValInt Int
+    | ValFloat Float
+    | ValString String
+    | ValBool Bool
+    | ValVoid
+    | ValArray (IORef [Value]) 
+    | ValStruct ID (M.Map ID (IORef Value))
+    | ValClosure [Param] Block (M.Map ID (IORef Value)) 
+
+instance Show Value where
+    show (ValInt v)    = show v
+    show (ValFloat v)  = show v
+    show (ValString v) = v
+    show (ValBool v)   = show v
+    show ValVoid       = "void"
+    show (ValArray _)  = "[Array]"
+    show (ValStruct n _) = "<Struct " ++ n ++ ">"
+    show (ValClosure {}) = "<Function>"
 
 -- Precedence
 infixr 1 :=
