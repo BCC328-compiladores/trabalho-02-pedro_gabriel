@@ -1,6 +1,6 @@
 module Utils.Tree where
 
-import Frontend.Parser.Syntax
+import Frontend.Syntax
 import Data.Tree (Tree(..), drawTree)
 
 

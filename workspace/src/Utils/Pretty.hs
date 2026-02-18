@@ -1,7 +1,7 @@
 module Utils.Pretty where
 
 import Prelude hiding ((<>))
-import Frontend.Parser.Syntax
+import Frontend.Syntax
 import Text.PrettyPrint
 
 class Pretty a where

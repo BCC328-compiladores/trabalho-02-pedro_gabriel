@@ -12,7 +12,7 @@ module Frontend.Parser.SL where
 
 import Frontend.Lexer.Token
 import Frontend.Lexer.SL hiding (lexer)
-import Frontend.Parser.Syntax
+import Frontend.Syntax
 import qualified Control.Monad as Happy_Prelude
 import qualified Data.Bool as Happy_Prelude
 import qualified Data.Function as Happy_Prelude

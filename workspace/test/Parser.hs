@@ -2,7 +2,7 @@ module Parser where
 
 import Test.HUnit
 import Frontend.Parser.SL (parseSL)
-import Frontend.Parser.Syntax
+import Frontend.Syntax
 import Frontend.Lexer.SL (runAlex)
 
 parse :: String -> Either String SL

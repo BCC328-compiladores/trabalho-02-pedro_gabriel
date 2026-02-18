@@ -3,7 +3,7 @@ module Frontend.Parser.SL where
 
 import Frontend.Lexer.Token
 import Frontend.Lexer.SL hiding (lexer)
-import Frontend.Parser.Syntax
+import Frontend.Syntax
 }
 
 %name parseSL

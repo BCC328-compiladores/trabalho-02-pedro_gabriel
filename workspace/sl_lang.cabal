@@ -1,6 +1,6 @@
 cabal-version:       3.0
 name:                sl-lang
-version:             1
+version:             2
 synopsis:            Compiler developed in the BCC328 course for the SL language.
 author:              Pedro Augusto Sousa Gonçalves, Gabriel Carlos Silva
 category:            Language
@@ -10,8 +10,9 @@ library
     exposed-modules:
         Frontend.Lexer.Token
         Frontend.Lexer.SL
-        Frontend.Parser.Syntax
+        Frontend.Syntax
         Frontend.Parser.SL
+        Interpreter
         Utils.Tree
         Utils.Pretty
 
@@ -25,7 +26,6 @@ library
       , base
       , containers
       , filepath
-      , megaparsec
       , mtl
       , parser-combinators
       , pretty
