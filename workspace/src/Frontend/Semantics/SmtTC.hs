@@ -90,7 +90,7 @@ tychStmts ctx (s:ss) =
 
 -- Verificação de Statement
 
-tychStmt :: Ctx -> Stmt -> Checker Ctx
+tychStmt :: Ctx -> Stmt -> Check Ctx
 
 -- Declaração de variáveis
 tychStmt ctx (VarDecl vid mTy mInit) =
