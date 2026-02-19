@@ -1,6 +1,6 @@
 module Utils.Tree where
 
-import Frontend.Parser.Syntax
+import Frontend.Syntax
 import Data.Tree (Tree(..), drawTree)
 
 
@@ -58,6 +58,10 @@ instance ToTree Stmt where
     toTree (Print expr) = Node "Print" [toTree expr]
 
     toTree (Scan expr) = Node "Scan" [toTree expr]
+
+    toTree Continue = Node "Continue" []
+     
+    toTree Break = Node "Break" []
 
     toTree (IF cond block elifs elseBlock) =
         Node "If" $ [toTree cond, toTree block] ++                    -- If

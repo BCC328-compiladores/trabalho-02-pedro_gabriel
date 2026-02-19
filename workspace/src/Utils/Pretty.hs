@@ -1,7 +1,7 @@
 module Utils.Pretty where
 
 import Prelude hiding ((<>))
-import Frontend.Parser.Syntax
+import Frontend.Syntax
 import Text.PrettyPrint
 
 class Pretty a where
@@ -76,6 +76,12 @@ instance Pretty Stmt where
         ppTypeAnnot Nothing = empty
         ppTypeAnnot (Just t) = text ":" <+> pp t
     
+    pp Continue = 
+        text "continue" <> text ";"
+ 
+    pp Break = 
+        text "break" <> text ";"
+
     pp (Return expr) = 
         text "return" <+> maybe empty pp expr <> text ";"
     

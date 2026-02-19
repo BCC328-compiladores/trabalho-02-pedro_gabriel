@@ -3,7 +3,7 @@ module Main where
 import Frontend.Lexer.SL (lexer, runAlex)
 import Frontend.Lexer.Token
 import Frontend.Parser.SL (parseSL)
-import Frontend.Parser.Syntax
+import Frontend.Syntax
 import Utils.Pretty (printPretty)
 import Utils.Tree (printTree)
 
@@ -117,6 +117,8 @@ runLexer file = do
                         TkNot           -> "!"
 
                         -- Reserved Lexemes
+                        TkContinue      -> "continue"
+                        TkBreak         -> "break"
                         TkStruct        -> "struct"
                         TkForAll        -> "forall"
                         TkFunc          -> "func"
