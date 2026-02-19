@@ -170,13 +170,8 @@ interpExpr g env (e1 :||: e2) = interpBinOp (.||.) e1 e2 g env
 interpExpr g env (Not e) = interpUnary opNot e g env
 interpExpr g env (Neg e) = interpUnary opNeg e g env
 
-<<<<<<< HEAD
-interpExpr g env (PostInc lvalue) = handleIncDec g env lvalue 1
-interpExpr g env (PostDec lvalue) = handleIncDec g env lvalue (-1)
-=======
 interpExpr g env (PostInc value) = handleIncDec g env value 1
 interpExpr g env (PostDec value) = handleIncDec g env value (-1)
->>>>>>> 9ddec3b (Finish Interpreter imp)
 
 -- Struct recursive acess
 interpExpr g env (objExpr :.: field) = do
@@ -268,11 +263,7 @@ interpExpr g env (NewArray baseType dimsExpr) = do
     calcArrayType t 0 = t
     calcArrayType t depth = TyArray (calcArrayType t (depth - 1)) Nothing
 
-<<<<<<< HEAD
--- Chamada de Função
-=======
 -- Function Call
->>>>>>> 9ddec3b (Finish Interpreter imp)
 interpExpr g env (FuncCall funcExpr args) = do
     closureVal <- interpExpr g env funcExpr
     argVals <- mapM (interpExpr g env) args
