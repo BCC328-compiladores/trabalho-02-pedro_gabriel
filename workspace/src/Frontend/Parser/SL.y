@@ -6,7 +6,11 @@ import Frontend.Lexer.SL hiding (lexer)
 import Frontend.Syntax
 }
 
-%name parseSL
+%name parseSL Main
+%name parseDecl Decl
+%name parseStmt Stmt
+%name parseExpr Expr
+
 %monad {Alex} { (>>=) } { return } 
 %tokentype { Token }
 %error { parseError }

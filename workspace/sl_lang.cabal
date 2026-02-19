@@ -12,6 +12,7 @@ library
         Frontend.Lexer.SL
         Frontend.Syntax
         Frontend.Parser.SL
+        Interpreter
         Utils.Tree
         Utils.Pretty
 
