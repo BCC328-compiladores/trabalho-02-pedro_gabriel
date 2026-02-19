@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use newtype instead of data" #-}
+{-# HLINT ignore "Use fromMaybe" #-}
 module Frontend.Syntax where
 
 import Data.IORef
@@ -153,22 +154,6 @@ defaultValue (TyArray t _) = do
 defaultValue (TyStruct _) = return ValVoid 
 defaultValue _            = return ValVoid
 
-checkValue :: Value -> Value -> Bool
-checkValue (ValInt _)        (ValInt _)        = True
-checkValue (ValFloat _)      (ValFloat _)      = True
-checkValue (ValString _)     (ValString _)     = True
-checkValue (ValBool _)       (ValBool _)       = True
-checkValue ValVoid           ValVoid           = True
-checkValue (ValArray t1 _)   (ValArray t2 _)   = t1 == t2
-checkValue (ValStruct id1 _) (ValStruct id2 _) = id1 == id2
-checkValue (ValClosure p1 r1 _ _) (ValClosure p2 r2 _ _) = 
-    r1 == r2 && compareParams p1 p2
-  where
-    compareParams [] [] = True
-    compareParams (Param _ tA : xs) (Param _ tB : ys) = tA == tB && compareParams xs ys
-    compareParams _ _ = False
-checkValue _ _ = False
-
 checkType :: Type -> Value -> Bool
 checkType TyInt (ValInt _)                 = True
 checkType TyFloat (ValFloat _)             = True
@@ -181,3 +166,22 @@ checkType (TyArray t1 _) (ValArray t2 _)   = t1 == t2
 checkType (TyArray _ _) ValVoid            = True
 checkType (TyVar _) _                      = True
 checkType _ _                              = False
+
+typeOfVal :: Value -> Type
+typeOfVal (ValInt _)       = TyInt
+typeOfVal (ValFloat _)     = TyFloat
+typeOfVal (ValString _)    = TyString
+typeOfVal (ValBool _)      = TyBool
+typeOfVal ValVoid          = TyVoid
+typeOfVal (ValArray t _)   = TyArray t Nothing
+typeOfVal (ValStruct id _) = TyStruct id
+typeOfVal (ValClosure params retType _ _) =
+    TyFunc (map (\(Param _ t) -> maybe TyVoid id t) params) (maybe TyVoid id retType)
+
+resolveType :: M.Map ID Type -> Type -> Type
+resolveType m (TyVar name) = 
+    case M.lookup name m of
+        Just t -> t
+        Nothing -> TyVar name
+resolveType m (TyArray t size) = TyArray (resolveType m t) size
+resolveType _ t = t

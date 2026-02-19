@@ -170,8 +170,13 @@ interpExpr g env (e1 :||: e2) = interpBinOp (.||.) e1 e2 g env
 interpExpr g env (Not e) = interpUnary opNot e g env
 interpExpr g env (Neg e) = interpUnary opNeg e g env
 
+<<<<<<< HEAD
 interpExpr g env (PostInc lvalue) = handleIncDec g env lvalue 1
 interpExpr g env (PostDec lvalue) = handleIncDec g env lvalue (-1)
+=======
+interpExpr g env (PostInc value) = handleIncDec g env value 1
+interpExpr g env (PostDec value) = handleIncDec g env value (-1)
+>>>>>>> 9ddec3b (Finish Interpreter imp)
 
 -- Struct recursive acess
 interpExpr g env (objExpr :.: field) = do
@@ -263,7 +268,11 @@ interpExpr g env (NewArray baseType dimsExpr) = do
     calcArrayType t 0 = t
     calcArrayType t depth = TyArray (calcArrayType t (depth - 1)) Nothing
 
+<<<<<<< HEAD
 -- Chamada de Função
+=======
+-- Function Call
+>>>>>>> 9ddec3b (Finish Interpreter imp)
 interpExpr g env (FuncCall funcExpr args) = do
     closureVal <- interpExpr g env funcExpr
     argVals <- mapM (interpExpr g env) args
@@ -272,21 +281,48 @@ interpExpr g env (FuncCall funcExpr args) = do
             if length params /= length argVals 
                 then error "Incorrect number of arguments for the function."
                 else do
-                    -- Types Validation 
+                    -- Inference of Generics
                     let pairs = zip params argVals
+                    let buildGenericsMap m (Param _ (Just (TyVar tName)), val) = 
+                            let vTy = typeOfVal val
+                            in case M.lookup tName m of
+                                Just expected -> if expected == vTy then m 
+                                                 else error $ "Generics conflict: '" ++ tName ++ "' was " ++ show expected ++ ", but received" ++ show vTy
+                                Nothing -> M.insert tName vTy m
+                        buildGenericsMap m (Param _ (Just (TyArray (TyVar tName) _)), ValArray vTy _) =
+                            case M.lookup tName m of
+                                Just expected -> if expected == vTy then m 
+                                                 else error $ "Generics conflict in the Array: '" ++ tName ++ "'"
+                                Nothing -> M.insert tName vTy m
+                        buildGenericsMap m _ = m
+                        
+                    let genericsMap = foldl buildGenericsMap M.empty pairs
+
+                    -- Argument Type Validation
                     mapM_ (\(Param pName pType, val) -> 
                         case pType of
-                            Just t -> unless (checkType t val) $
-                                error $ "Type error in the arg '" ++ pName ++ "'. Expected " ++ show t ++ " but received: " ++ show val
+                            Just t -> do
+                                let resolvedType = resolveType genericsMap t
+                                unless (checkType resolvedType val) $
+                                    error $ "Type error in arg '" ++ pName ++ "'. Expected " ++ show resolvedType ++ ", received: " ++ show val
                             Nothing -> return ()
                         ) pairs
 
-                    -- Create memory ref
+                    -- Env config and execution
                     argRefs <- mapM newIORef argVals
                     let argBindings = M.fromList $ zip [pid | Param pid _ <- params] argRefs
                     let execEnv = argBindings `M.union` capturedEnv
-                    -- The result will be the value returned by the function.
-                    interpBlock g execEnv body
+                    
+                    resultVal <- interpBlock g execEnv body
+                    
+                    -- Check Return
+                    case retType of
+                        Just rt -> do
+                            let resolvedRetType = resolveType genericsMap rt
+                            unless (checkType resolvedRetType resultVal) $
+                                error $ "Type error in return. Expected: "++ show resolvedRetType++" Returned: " ++ show resultVal
+                            return resultVal
+                        Nothing -> return resultVal
         
         _ -> error $ "Attempting to call a value that is not a function: " ++ show closureVal
 
@@ -371,12 +407,25 @@ interpBlock g env (Block stmts) = do
                         Just t  -> defaultValue t
                         Nothing -> error $ "Variable '" ++ id ++ "' needs an initial type or value in the declaretion."
                 
-                -- Type Check
-                case maybeType of
-                    Just t -> unless (checkType t val) $
-                        error $ "Type error in variable '" ++ id ++ "'. Expected " ++ show t ++ " but received " ++ show val
-                    Nothing -> return ()
+                -- If there is no explicit type, the type is inferred from the value.
+                inferredType <- case maybeType of
+                        -- Array Case
+                        Just (TyArray t Nothing) -> case val of
+                            ValArray _ ref -> do
+                                list <- readIORef ref
+                                return $ TyArray t $ Just $ LitInt $ length list
+                            _ -> return $ TyArray t Nothing
+                        Just t -> return t
+                        Nothing -> case val of
+                            ValArray t ref -> do
+                                list <- readIORef ref
+                                return $ TyArray t (Just (LitInt (length list)))
+                            _ -> return (typeOfVal val)
                 
+                -- TypeCheck
+                unless (checkType inferredType val)
+                    $ error $ "Type error in variable '"++ id ++ "'. Expected: "++show inferredType++" Received: "++ show val
+
                 -- Create memory ref
                 ref <- newIORef val
                 let newEnv = M.insert id ref currentEnv
@@ -547,6 +596,23 @@ runReplStmt g env stmt = case stmt of
             Nothing -> case maybeType of
                 Just t  -> defaultValue t
                 Nothing -> error "Console: Variables need a type or initial value."
+        
+        inferredType <- case maybeType of
+            Just (TyArray t Nothing) -> case val of
+                ValArray _ ref -> do
+                    list <- readIORef ref
+                    return $ TyArray t $ Just $ LitInt $ length list
+                _ -> return $ TyArray t Nothing
+            Just t -> return t
+            Nothing -> case val of
+                ValArray t ref -> do
+                    list <- readIORef ref
+                    return $ TyArray t (Just (LitInt (length list)))
+                _ -> return (typeOfVal val)
+
+        unless (checkType inferredType val)
+            $ error $ "Console Type error: Expected " ++ show inferredType ++ " Received: " ++ show val
+
         ref <- newIORef val
         return (M.insert id ref env)
         
