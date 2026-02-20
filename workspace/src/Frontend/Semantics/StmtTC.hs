@@ -128,23 +128,27 @@ tychStmt ctx (Loc pos stmtCore) = do
     case stmtCore of
         -- Var declaretion
         VarDecl vid mTy mInit ->
+            -- Verify name
+            if M.member vid (structCtx c) || M.member vid (funcCtx c)
+                then duplicateDecl c vid
+            else
             -- Apply the conversion using the generics of the current context
-            let realTy = fmap (replaceGenerics (genericsCtx c)) mTy
-             in case (mTy, mInit) of
-                (Just ty, Just initExpr) -> do
-                    ti <- tychExpr c initExpr
-                    _ <- checkAssign c ty ti
-                    let newVarCtx = M.insert vid ty (varCtx c)
-                    return c { varCtx = newVarCtx }
-                (Just ty, Nothing) -> do
-                    let newVarCtx = M.insert vid ty (varCtx c)
-                    return c { varCtx = newVarCtx }
-                (Nothing, Just initExpr) -> do
-                    ti <- tychExpr c initExpr
-                    let newVarCtx = M.insert vid ti (varCtx c)
-                    return c { varCtx = newVarCtx }
-                (Nothing, Nothing) ->
-                    genericError c ("Variable '" ++ vid ++ "' declared without type or initialiser")
+                let realTy = fmap (replaceGenerics (genericsCtx c)) mTy
+                 in case (mTy, mInit) of
+                    (Just ty, Just initExpr) -> do
+                        ti <- tychExpr c initExpr
+                        _ <- checkAssign c ty ti
+                        let newVarCtx = M.insert vid ty (varCtx c)
+                        return c { varCtx = newVarCtx }
+                    (Just ty, Nothing) -> do
+                        let newVarCtx = M.insert vid ty (varCtx c)
+                        return c { varCtx = newVarCtx }
+                    (Nothing, Just initExpr) -> do
+                        ti <- tychExpr c initExpr
+                        let newVarCtx = M.insert vid ti (varCtx c)
+                        return c { varCtx = newVarCtx }
+                    (Nothing, Nothing) ->
+                        genericError c ("Variable '" ++ vid ++ "' declared without type or initialiser")
         
         -- Return
         Return mExpr ->

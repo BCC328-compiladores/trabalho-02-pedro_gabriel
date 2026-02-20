@@ -42,7 +42,9 @@ instance Show Type where
     show TyString       = "String"
     show TyBool         = "Bool"
     show TyVoid         = "Void"
-    show (TyArray t _)  = "[" ++ show t ++ "]"
+    show (TyArray t Nothing)            = show t ++ "[]"
+    show (TyArray t (Just (LitInt n)))  = show t ++ "[" ++ show n ++ "]"
+    show (TyArray t (Just _))           = show t ++ "[?]"
     show (TyStruct n)   = "Struct<" ++ n ++ ">"
     show (TyFunc ps r)  = "(" ++ intercalate ", " (map show ps) ++ ") -> " ++ show r
     show (TyVar v)      = "Generic " ++ v

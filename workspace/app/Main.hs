@@ -18,6 +18,7 @@ import Control.Monad (foldM)
 import Control.Monad.IO.Class (liftIO)
 import Data.List (isPrefixOf)
 import qualified Data.Map as M
+import Control.Exception (catch, ErrorCall(..))
 
 data Option
   = Help
@@ -276,7 +277,11 @@ handleStmt input ctx globals env = do
                     return (ctx, globals, env)
                 -- Evaluate and Exec
                 Right newCtx -> do
-                    newEnv <- execReplStmts globals env stmts
+                    -- Catch any Haskell errors.
+                    newEnv <- catch (execReplStmts globals env stmts) 
+                                    (\(ErrorCall msg) -> do
+                                        putStrLn msg -- Just print error
+                                        return env)  -- Continue at the evn without change
                     return (newCtx, globals, newEnv)
 
 -- Verify comand structure 

@@ -117,8 +117,9 @@ interpExpr _ _ (LitString a) = return $ ValString a
 interpExpr _ _ (LitBool a)   = return $ ValBool a
 interpExpr g env (LitArray exprs) = do
     values <- mapM (interpExpr g env) exprs
+    let elemTy = if null values then TyVoid else typeOfVal (head values)
     ref <- newIORef values
-    return $ ValArray TyVoid ref 
+    return $ ValArray elemTy ref 
 
 -- Vars
 interpExpr g env (Var id) = do
