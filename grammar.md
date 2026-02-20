@@ -54,7 +54,7 @@ OptElse -> "else" "{" Block "}" | $\lambda$
 
 WhileStmt -> "while" "(" Expr ")" "{" Block "}" 
 
-ForStmt -> "for" "(" Expr ";" Expr ";" Expr ")" "{" Block "}"
+ForStmt -> "for" "(" Stmt ";" Expr ";" Expr ")" "{" Block "}"
 
 ## Expressions:
 Expr -> AssignExpr 
