@@ -36,13 +36,15 @@ Block -> StmtList
 
 StmtList -> Stmt StmtList | $\lambda$
 
-Stmt -> VarDecl ";" | ReturnStmt ";" | PrintStmt ";" | Expr ";" | IfStmt | WhileStmt | ForStmt
+Stmt -> VarDecl ";" | ReturnStmt ";" | PrintStmt ";" | ScanStmt ";" | Expr ";" | IfStmt | WhileStmt | ForStmt | "continue" ";" | "break" ";"
 
-VarDecl -> "let" *ID* ":" Type "=" Expr |  "let" *ID* ":" Type | "let" *ID* "=" Expr
+VarDecl -> "let" *ID* ":" Type "=" Expr |  "let" *ID* ":" Type | "let" *ID* "=" Expr | "let" *ID*
 
 ReturnStmt -> "return" Expr | "return" 
 
 PrintStmt -> "print" "(" Expr ")" 
+
+ScanStmt -> "scan" "(" Expr ")"
 
 IfStmt -> "if" "(" Expr ")" "{" Block "}" OptElif 
 
@@ -57,7 +59,7 @@ ForStmt -> "for" "(" Expr ";" Expr ";" Expr ")" "{" Block "}"
 ## Expressions:
 Expr -> AssignExpr 
 
-AssignExpr -> LValue "=" OrExpr | OrExpr 
+AssignExpr -> PrimaryExpr "=" OrExpr | OrExpr 
 
 OrExpr -> OrExpr "||" AndExpr | AndExpr 
 
@@ -71,23 +73,21 @@ MultiExpr -> MultiExpr MultiOp UnaryExpr | UnaryExpr
 
 UnaryExpr -> "!" UnaryExpr | "-" UnaryExpr | PrimaryExpr 
 
-PrimaryExpr -> Literal | "[" ExprList "]" | LValue | FuncCall | ObjCreation | ArrayCreation | "(" Expr ")" | IncrementExpr | DecrementExpr
+PrimaryExpr -> Literal | "[" ExprList "]" | PrimaryExpr "[" Expr "]" | PrimaryExpr "." *ID* | FuncCall | ObjCreation | ArrayCreation | "(" Expr ")" | IncrementExpr | DecrementExpr | *ID*
 
-LValue -> *ID* | LValue "[" Expr "]" | LValue "." *ID* 
-
-FuncCall -> *ID* "(" ExprList ")" 
+FuncCall -> PrimaryExpr "(" ExprList ")" 
 
 ExprList -> Expr "," ExprList | Expr | $\lambda$ 
 
-ObjCreation -> *ID* "{" ExprList "}" 
+ObjCreation -> "new" *ID* "{" ExprList "}" | *ID* "{" ExprList "}"
 
-ArrayCreation -> *new* Type DimList
+ArrayCreation -> "new" Type DimList
 
 DimList -> "[" Expr "]" DimList | "[" Expr "]"
 
-IncrementExpr -> LValue "++" 
+IncrementExpr -> PrimaryExpr "++" 
 
-DecrementExpr -> LValue "--"
+DecrementExpr -> PrimaryExpr "--"
 
 ## Auxiliary Terminals:
 CompOp -> "==" | "!=" | "<" | "<=" | ">" | ">=" 
@@ -96,4 +96,4 @@ AddOp -> "+" | "-"
 
 MultiOp -> "*" | "/" 
 
-Literal -> *IntLit* | *FloatLit* | *StringLit* | *BoolLit*
+Literal -> *IntLit* | *FloatLit* | *StringLit* | *BoolLit* | *ArrayLit*

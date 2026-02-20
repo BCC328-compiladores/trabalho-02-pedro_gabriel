@@ -124,3 +124,7 @@ instance ToTree Expr where
     
     -- To print (2 + 3) from 1 + (2 + 3)
     toTree (Paren e) = Node "(expr)" [toTree e]
+
+-- To ignore Loc a
+instance ToTree a => ToTree (Loc a) where
+    toTree (Loc _ a) = toTree a

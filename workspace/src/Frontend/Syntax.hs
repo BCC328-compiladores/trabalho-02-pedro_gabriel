@@ -5,9 +5,17 @@ module Frontend.Syntax where
 
 import Data.IORef
 import qualified Data.Map as M
+import Data.List (intercalate)
 
 -- ID to Var, Func, and Struct
 type ID = String
+
+-- Help to indentify the position where are some semantic error
+type Pos = (Int, Int)
+data Loc a = Loc Pos a deriving (Ord, Show)
+
+instance Eq a => Eq (Loc a) where
+    (Loc _ a) == (Loc _ b) = a == b
 
 -- ==========================================
 -- AST
@@ -26,21 +34,32 @@ data Type
     | TyFunc [Type] Type
     -- Generic type for inference --
     | TyVar ID
-    deriving (Eq, Ord, Show)
+    deriving (Eq, Ord)
+
+instance Show Type where
+    show TyInt          = "Int"
+    show TyFloat        = "Float"
+    show TyString       = "String"
+    show TyBool         = "Bool"
+    show TyVoid         = "Void"
+    show (TyArray t _)  = "[" ++ show t ++ "]"
+    show (TyStruct n)   = "Struct<" ++ n ++ ">"
+    show (TyFunc ps r)  = "(" ++ intercalate ", " (map show ps) ++ ") -> " ++ show r
+    show (TyVar v)      = "Generic " ++ v
 
 -- Main , Struct and Func
 
-data SL = SL [Decl] deriving (Eq, Ord, Show)
+data SL = SL [Loc Decl] deriving (Eq, Ord, Show)
 
 data Decl
-    = Struct ID [Field]
-    | Func Generics ID [Param] (Maybe Type) Block
+    = Struct ID [Loc Field]
+    | Func Generics ID [Loc Param] (Maybe Type) Block
     deriving (Eq, Ord, Show)
 
 data Field = Field ID Type deriving (Eq, Ord, Show)
 data Param = Param ID (Maybe Type) deriving (Eq, Ord, Show)
 data Generics = Generics (Maybe [ID])  deriving (Eq, Ord, Show)
-data Block = Block [Stmt] deriving (Eq, Ord, Show)
+data Block = Block [Loc Stmt] deriving (Eq, Ord, Show)
 
 -- Stmt
 data Stmt 
@@ -55,6 +74,7 @@ data Stmt
     | For Expr Expr Expr Block
     | Exp Expr  -- Isolated expression
     deriving (Eq, Ord, Show)
+
 
 data Expr
     -- Assignment

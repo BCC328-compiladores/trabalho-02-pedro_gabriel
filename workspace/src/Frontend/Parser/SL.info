@@ -94,7 +94,7 @@ Grammar
 	LValue -> id                                       (85)
 	LValue -> Expr '.' id                              (86)
 	LValue -> Expr '[' Expr ']'                        (87)
-	FuncCall -> id '(' ExprList ')'                    (88)
+	FuncCall -> Expr '(' ExprList ')'                  (88)
 	ObjCreation -> id '{' ExprList '}'                 (89)
 	ArrayCreation -> new BaseType DimList              (90)
 	DimList -> '[' Expr ']' DimList                    (91)
@@ -387,21 +387,23 @@ State 12
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
-	'['            shift, and enter state 54
-	'.'            shift, and enter state 55
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'('            shift, and enter state 54
+	'['            shift, and enter state 55
+	'.'            shift, and enter state 56
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 	%eof           accept
 
 
@@ -412,6 +414,7 @@ State 13
 	Expr -> LValue . '--'                               (rule 78)
 	Expr -> LValue .                                    (rule 79)
 
+	'('            reduce using rule 79
 	')'            reduce using rule 79
 	'['            reduce using rule 79
 	']'            reduce using rule 79
@@ -441,6 +444,7 @@ State 14
 
 	Expr -> FuncCall .                                  (rule 80)
 
+	'('            reduce using rule 80
 	')'            reduce using rule 80
 	'['            reduce using rule 80
 	']'            reduce using rule 80
@@ -467,6 +471,7 @@ State 15
 
 	Expr -> ObjCreation .                               (rule 81)
 
+	'('            reduce using rule 81
 	')'            reduce using rule 81
 	'['            reduce using rule 81
 	']'            reduce using rule 81
@@ -493,6 +498,7 @@ State 16
 
 	Expr -> ArrayCreation .                             (rule 83)
 
+	'('            reduce using rule 83
 	')'            reduce using rule 83
 	'['            reduce using rule 83
 	']'            reduce using rule 83
@@ -519,6 +525,7 @@ State 17
 
 	Expr -> Literals .                                  (rule 82)
 
+	'('            reduce using rule 82
 	')'            reduce using rule 82
 	'['            reduce using rule 82
 	']'            reduce using rule 82
@@ -557,10 +564,9 @@ State 18
 State 19
 
 	LValue -> id .                                      (rule 85)
-	FuncCall -> id . '(' ExprList ')'                   (rule 88)
 	ObjCreation -> id . '{' ExprList '}'                (rule 89)
 
-	'('            shift, and enter state 74
+	'('            reduce using rule 85
 	')'            reduce using rule 85
 	'['            reduce using rule 85
 	']'            reduce using rule 85
@@ -591,6 +597,7 @@ State 20
 
 	Literals -> int_lit .                               (rule 93)
 
+	'('            reduce using rule 93
 	')'            reduce using rule 93
 	'['            reduce using rule 93
 	']'            reduce using rule 93
@@ -617,6 +624,7 @@ State 21
 
 	Literals -> float_lit .                             (rule 94)
 
+	'('            reduce using rule 94
 	')'            reduce using rule 94
 	'['            reduce using rule 94
 	']'            reduce using rule 94
@@ -643,6 +651,7 @@ State 22
 
 	Literals -> str_lit .                               (rule 95)
 
+	'('            reduce using rule 95
 	')'            reduce using rule 95
 	'['            reduce using rule 95
 	']'            reduce using rule 95
@@ -669,6 +678,7 @@ State 23
 
 	Literals -> bool_lit .                              (rule 96)
 
+	'('            reduce using rule 96
 	')'            reduce using rule 96
 	'['            reduce using rule 96
 	']'            reduce using rule 96
@@ -706,7 +716,7 @@ State 24
 	'!'            shift, and enter state 26
 	'-'            shift, and enter state 27
 
-	Expr           goto state 73
+	Expr           goto state 74
 	LValue         goto state 13
 	FuncCall       goto state 14
 	ObjCreation    goto state 15
@@ -729,13 +739,13 @@ State 25
 	'!'            shift, and enter state 26
 	'-'            shift, and enter state 27
 
-	Expr           goto state 71
+	Expr           goto state 72
 	LValue         goto state 13
 	FuncCall       goto state 14
 	ObjCreation    goto state 15
 	ArrayCreation  goto state 16
 	Literals       goto state 17
-	ExprList       goto state 72
+	ExprList       goto state 73
 
 State 26
 
@@ -752,7 +762,7 @@ State 26
 	'!'            shift, and enter state 26
 	'-'            shift, and enter state 27
 
-	Expr           goto state 70
+	Expr           goto state 71
 	LValue         goto state 13
 	FuncCall       goto state 14
 	ObjCreation    goto state 15
@@ -774,7 +784,7 @@ State 27
 	'!'            shift, and enter state 26
 	'-'            shift, and enter state 27
 
-	Expr           goto state 69
+	Expr           goto state 70
 	LValue         goto state 13
 	FuncCall       goto state 14
 	ObjCreation    goto state 15
@@ -886,22 +896,24 @@ State 32
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
-	'['            shift, and enter state 54
-	'.'            shift, and enter state 55
-	';'            shift, and enter state 56
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'('            shift, and enter state 54
+	'['            shift, and enter state 55
+	'.'            shift, and enter state 56
+	';'            shift, and enter state 57
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
 
 State 33
@@ -1134,22 +1146,24 @@ State 50
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
-	'['            shift, and enter state 54
-	'.'            shift, and enter state 55
+	'('            shift, and enter state 54
+	'['            shift, and enter state 55
+	'.'            shift, and enter state 56
 	';'            reduce using rule 53
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
 
 State 51
@@ -1218,6 +1232,30 @@ State 53
 
 State 54
 
+	FuncCall -> Expr '(' . ExprList ')'                 (rule 88)
+
+	new            shift, and enter state 18
+	id             shift, and enter state 19
+	int_lit        shift, and enter state 20
+	float_lit      shift, and enter state 21
+	str_lit        shift, and enter state 22
+	bool_lit       shift, and enter state 23
+	'('            shift, and enter state 24
+	')'            reduce using rule 100
+	'['            shift, and enter state 25
+	'!'            shift, and enter state 26
+	'-'            shift, and enter state 27
+
+	Expr           goto state 72
+	LValue         goto state 13
+	FuncCall       goto state 14
+	ObjCreation    goto state 15
+	ArrayCreation  goto state 16
+	Literals       goto state 17
+	ExprList       goto state 116
+
+State 55
+
 	LValue -> Expr '[' . Expr ']'                       (rule 87)
 
 	new            shift, and enter state 18
@@ -1231,21 +1269,21 @@ State 54
 	'!'            shift, and enter state 26
 	'-'            shift, and enter state 27
 
-	Expr           goto state 116
+	Expr           goto state 115
 	LValue         goto state 13
 	FuncCall       goto state 14
 	ObjCreation    goto state 15
 	ArrayCreation  goto state 16
 	Literals       goto state 17
 
-State 55
+State 56
 
 	LValue -> Expr '.' . id                             (rule 86)
 
-	id             shift, and enter state 115
+	id             shift, and enter state 114
 
 
-State 56
+State 57
 
 	Stmt -> Expr ';' .                                  (rule 52)
 
@@ -1272,31 +1310,9 @@ State 56
 	%eof           reduce using rule 52
 
 
-State 57
-
-	Expr -> Expr '==' . Expr                            (rule 65)
-
-	new            shift, and enter state 18
-	id             shift, and enter state 19
-	int_lit        shift, and enter state 20
-	float_lit      shift, and enter state 21
-	str_lit        shift, and enter state 22
-	bool_lit       shift, and enter state 23
-	'('            shift, and enter state 24
-	'['            shift, and enter state 25
-	'!'            shift, and enter state 26
-	'-'            shift, and enter state 27
-
-	Expr           goto state 114
-	LValue         goto state 13
-	FuncCall       goto state 14
-	ObjCreation    goto state 15
-	ArrayCreation  goto state 16
-	Literals       goto state 17
-
 State 58
 
-	Expr -> Expr '!=' . Expr                            (rule 66)
+	Expr -> Expr '==' . Expr                            (rule 65)
 
 	new            shift, and enter state 18
 	id             shift, and enter state 19
@@ -1318,7 +1334,7 @@ State 58
 
 State 59
 
-	Expr -> Expr '<' . Expr                             (rule 67)
+	Expr -> Expr '!=' . Expr                            (rule 66)
 
 	new            shift, and enter state 18
 	id             shift, and enter state 19
@@ -1340,7 +1356,7 @@ State 59
 
 State 60
 
-	Expr -> Expr '<=' . Expr                            (rule 68)
+	Expr -> Expr '<' . Expr                             (rule 67)
 
 	new            shift, and enter state 18
 	id             shift, and enter state 19
@@ -1362,7 +1378,7 @@ State 60
 
 State 61
 
-	Expr -> Expr '>' . Expr                             (rule 69)
+	Expr -> Expr '<=' . Expr                            (rule 68)
 
 	new            shift, and enter state 18
 	id             shift, and enter state 19
@@ -1384,7 +1400,7 @@ State 61
 
 State 62
 
-	Expr -> Expr '>=' . Expr                            (rule 70)
+	Expr -> Expr '>' . Expr                             (rule 69)
 
 	new            shift, and enter state 18
 	id             shift, and enter state 19
@@ -1406,7 +1422,7 @@ State 62
 
 State 63
 
-	Expr -> Expr '&&' . Expr                            (rule 64)
+	Expr -> Expr '>=' . Expr                            (rule 70)
 
 	new            shift, and enter state 18
 	id             shift, and enter state 19
@@ -1428,7 +1444,7 @@ State 63
 
 State 64
 
-	Expr -> Expr '||' . Expr                            (rule 63)
+	Expr -> Expr '&&' . Expr                            (rule 64)
 
 	new            shift, and enter state 18
 	id             shift, and enter state 19
@@ -1450,7 +1466,7 @@ State 64
 
 State 65
 
-	Expr -> Expr '+' . Expr                             (rule 71)
+	Expr -> Expr '||' . Expr                            (rule 63)
 
 	new            shift, and enter state 18
 	id             shift, and enter state 19
@@ -1472,7 +1488,7 @@ State 65
 
 State 66
 
-	Expr -> Expr '-' . Expr                             (rule 72)
+	Expr -> Expr '+' . Expr                             (rule 71)
 
 	new            shift, and enter state 18
 	id             shift, and enter state 19
@@ -1494,7 +1510,7 @@ State 66
 
 State 67
 
-	Expr -> Expr '*' . Expr                             (rule 73)
+	Expr -> Expr '-' . Expr                             (rule 72)
 
 	new            shift, and enter state 18
 	id             shift, and enter state 19
@@ -1516,7 +1532,7 @@ State 67
 
 State 68
 
-	Expr -> Expr '/' . Expr                             (rule 74)
+	Expr -> Expr '*' . Expr                             (rule 73)
 
 	new            shift, and enter state 18
 	id             shift, and enter state 19
@@ -1538,6 +1554,28 @@ State 68
 
 State 69
 
+	Expr -> Expr '/' . Expr                             (rule 74)
+
+	new            shift, and enter state 18
+	id             shift, and enter state 19
+	int_lit        shift, and enter state 20
+	float_lit      shift, and enter state 21
+	str_lit        shift, and enter state 22
+	bool_lit       shift, and enter state 23
+	'('            shift, and enter state 24
+	'['            shift, and enter state 25
+	'!'            shift, and enter state 26
+	'-'            shift, and enter state 27
+
+	Expr           goto state 102
+	LValue         goto state 13
+	FuncCall       goto state 14
+	ObjCreation    goto state 15
+	ArrayCreation  goto state 16
+	Literals       goto state 17
+
+State 70
+
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
 	Expr -> Expr . '==' Expr                            (rule 65)
@@ -1553,12 +1591,14 @@ State 69
 	Expr -> '-' Expr .                                  (rule 76)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 76
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 76
 	'}'            reduce using rule 76
-	'.'            shift, and enter state 55
+	'.'            shift, and enter state 56
 	','            reduce using rule 76
 	';'            reduce using rule 76
 	'=='           reduce using rule 76
@@ -1576,7 +1616,7 @@ State 69
 	%eof           reduce using rule 76
 
 
-State 70
+State 71
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
@@ -1593,12 +1633,14 @@ State 70
 	Expr -> '!' Expr .                                  (rule 75)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 75
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 75
 	'}'            reduce using rule 75
-	'.'            shift, and enter state 55
+	'.'            shift, and enter state 56
 	','            reduce using rule 75
 	';'            reduce using rule 75
 	'=='           reduce using rule 75
@@ -1616,7 +1658,7 @@ State 70
 	%eof           reduce using rule 75
 
 
-State 71
+State 72
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
@@ -1632,37 +1674,39 @@ State 71
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 	ExprList -> Expr . ',' ExprList                     (rule 98)
 	ExprList -> Expr .                                  (rule 99)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 99
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 99
 	'}'            reduce using rule 99
-	'.'            shift, and enter state 55
-	','            shift, and enter state 102
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
-
-
-State 72
-
-	Literals -> '[' ExprList . ']'                      (rule 97)
-
-	']'            shift, and enter state 101
+	'.'            shift, and enter state 56
+	','            shift, and enter state 101
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
 
 State 73
+
+	Literals -> '[' ExprList . ']'                      (rule 97)
+
+	']'            shift, and enter state 100
+
+
+State 74
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
@@ -1679,47 +1723,25 @@ State 73
 	Expr -> '(' Expr . ')'                              (rule 84)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
-	')'            shift, and enter state 100
-	'['            shift, and enter state 54
-	'.'            shift, and enter state 55
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'('            shift, and enter state 54
+	')'            shift, and enter state 99
+	'['            shift, and enter state 55
+	'.'            shift, and enter state 56
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
-
-State 74
-
-	FuncCall -> id '(' . ExprList ')'                   (rule 88)
-
-	new            shift, and enter state 18
-	id             shift, and enter state 19
-	int_lit        shift, and enter state 20
-	float_lit      shift, and enter state 21
-	str_lit        shift, and enter state 22
-	bool_lit       shift, and enter state 23
-	'('            shift, and enter state 24
-	')'            reduce using rule 100
-	'['            shift, and enter state 25
-	'!'            shift, and enter state 26
-	'-'            shift, and enter state 27
-
-	Expr           goto state 71
-	LValue         goto state 13
-	FuncCall       goto state 14
-	ObjCreation    goto state 15
-	ArrayCreation  goto state 16
-	Literals       goto state 17
-	ExprList       goto state 99
 
 State 75
 
@@ -1737,7 +1759,7 @@ State 75
 	'!'            shift, and enter state 26
 	'-'            shift, and enter state 27
 
-	Expr           goto state 71
+	Expr           goto state 72
 	LValue         goto state 13
 	FuncCall       goto state 14
 	ObjCreation    goto state 15
@@ -1829,6 +1851,7 @@ State 83
 
 	Expr -> LValue '++' .                               (rule 77)
 
+	'('            reduce using rule 77
 	')'            reduce using rule 77
 	'['            reduce using rule 77
 	']'            reduce using rule 77
@@ -1855,6 +1878,7 @@ State 84
 
 	Expr -> LValue '--' .                               (rule 78)
 
+	'('            reduce using rule 78
 	')'            reduce using rule 78
 	'['            reduce using rule 78
 	']'            reduce using rule 78
@@ -1985,26 +2009,28 @@ State 95
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 62
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 62
 	'}'            reduce using rule 62
-	'.'            shift, and enter state 55
+	'.'            shift, and enter state 56
 	','            reduce using rule 62
 	';'            reduce using rule 62
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 	%eof           reduce using rule 62
 
 
@@ -2012,6 +2038,7 @@ State 96
 
 	ArrayCreation -> new BaseType DimList .             (rule 90)
 
+	'('            reduce using rule 90
 	')'            reduce using rule 90
 	'['            reduce using rule 90
 	']'            reduce using rule 90
@@ -2066,15 +2093,9 @@ State 98
 
 State 99
 
-	FuncCall -> id '(' ExprList . ')'                   (rule 88)
-
-	')'            shift, and enter state 136
-
-
-State 100
-
 	Expr -> '(' Expr ')' .                              (rule 84)
 
+	'('            reduce using rule 84
 	')'            reduce using rule 84
 	'['            reduce using rule 84
 	']'            reduce using rule 84
@@ -2097,10 +2118,11 @@ State 100
 	%eof           reduce using rule 84
 
 
-State 101
+State 100
 
 	Literals -> '[' ExprList ']' .                      (rule 97)
 
+	'('            reduce using rule 97
 	')'            reduce using rule 97
 	'['            reduce using rule 97
 	']'            reduce using rule 97
@@ -2123,7 +2145,7 @@ State 101
 	%eof           reduce using rule 97
 
 
-State 102
+State 101
 
 	ExprList -> Expr ',' . ExprList                     (rule 98)
 
@@ -2141,15 +2163,15 @@ State 102
 	'!'            shift, and enter state 26
 	'-'            shift, and enter state 27
 
-	Expr           goto state 71
+	Expr           goto state 72
 	LValue         goto state 13
 	FuncCall       goto state 14
 	ObjCreation    goto state 15
 	ArrayCreation  goto state 16
 	Literals       goto state 17
-	ExprList       goto state 135
+	ExprList       goto state 136
 
-State 103
+State 102
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
@@ -2166,12 +2188,14 @@ State 103
 	Expr -> Expr '/' Expr .                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 74
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 74
 	'}'            reduce using rule 74
-	'.'            shift, and enter state 55
+	'.'            shift, and enter state 56
 	','            reduce using rule 74
 	';'            reduce using rule 74
 	'=='           reduce using rule 74
@@ -2189,7 +2213,7 @@ State 103
 	%eof           reduce using rule 74
 
 
-State 104
+State 103
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
@@ -2206,12 +2230,14 @@ State 104
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 73
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 73
 	'}'            reduce using rule 73
-	'.'            shift, and enter state 55
+	'.'            shift, and enter state 56
 	','            reduce using rule 73
 	';'            reduce using rule 73
 	'=='           reduce using rule 73
@@ -2229,7 +2255,7 @@ State 104
 	%eof           reduce using rule 73
 
 
-State 105
+State 104
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
@@ -2246,12 +2272,14 @@ State 105
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 72
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 72
 	'}'            reduce using rule 72
-	'.'            shift, and enter state 55
+	'.'            shift, and enter state 56
 	','            reduce using rule 72
 	';'            reduce using rule 72
 	'=='           reduce using rule 72
@@ -2264,12 +2292,12 @@ State 105
 	'||'           reduce using rule 72
 	'+'            reduce using rule 72
 	'-'            reduce using rule 72
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 	%eof           reduce using rule 72
 
 
-State 106
+State 105
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
@@ -2286,12 +2314,14 @@ State 106
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 71
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 71
 	'}'            reduce using rule 71
-	'.'            shift, and enter state 55
+	'.'            shift, and enter state 56
 	','            reduce using rule 71
 	';'            reduce using rule 71
 	'=='           reduce using rule 71
@@ -2304,12 +2334,12 @@ State 106
 	'||'           reduce using rule 71
 	'+'            reduce using rule 71
 	'-'            reduce using rule 71
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 	%eof           reduce using rule 71
 
 
-State 107
+State 106
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr '||' Expr .                            (rule 63)
@@ -2326,30 +2356,32 @@ State 107
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 63
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 63
 	'}'            reduce using rule 63
-	'.'            shift, and enter state 55
+	'.'            shift, and enter state 56
 	','            reduce using rule 63
 	';'            reduce using rule 63
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
 	'||'           reduce using rule 63
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 	%eof           reduce using rule 63
 
 
-State 108
+State 107
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
@@ -2366,30 +2398,32 @@ State 108
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 64
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 64
 	'}'            reduce using rule 64
-	'.'            shift, and enter state 55
+	'.'            shift, and enter state 56
 	','            reduce using rule 64
 	';'            reduce using rule 64
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
 	'&&'           reduce using rule 64
 	'||'           reduce using rule 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 	%eof           reduce using rule 64
 
 
-State 109
+State 108
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
@@ -2406,12 +2440,14 @@ State 109
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 70
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 70
 	'}'            reduce using rule 70
-	'.'            shift, and enter state 55
+	'.'            shift, and enter state 56
 	','            reduce using rule 70
 	';'            reduce using rule 70
 	'=='           fail
@@ -2422,14 +2458,14 @@ State 109
 	'>='           fail
 	'&&'           reduce using rule 70
 	'||'           reduce using rule 70
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 	%eof           reduce using rule 70
 
 
-State 110
+State 109
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
@@ -2446,12 +2482,14 @@ State 110
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 69
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 69
 	'}'            reduce using rule 69
-	'.'            shift, and enter state 55
+	'.'            shift, and enter state 56
 	','            reduce using rule 69
 	';'            reduce using rule 69
 	'=='           fail
@@ -2462,14 +2500,14 @@ State 110
 	'>='           fail
 	'&&'           reduce using rule 69
 	'||'           reduce using rule 69
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 	%eof           reduce using rule 69
 
 
-State 111
+State 110
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
@@ -2486,12 +2524,14 @@ State 111
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 68
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 68
 	'}'            reduce using rule 68
-	'.'            shift, and enter state 55
+	'.'            shift, and enter state 56
 	','            reduce using rule 68
 	';'            reduce using rule 68
 	'=='           fail
@@ -2502,14 +2542,14 @@ State 111
 	'>='           fail
 	'&&'           reduce using rule 68
 	'||'           reduce using rule 68
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 	%eof           reduce using rule 68
 
 
-State 112
+State 111
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
@@ -2526,12 +2566,14 @@ State 112
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 67
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 67
 	'}'            reduce using rule 67
-	'.'            shift, and enter state 55
+	'.'            shift, and enter state 56
 	','            reduce using rule 67
 	';'            reduce using rule 67
 	'=='           fail
@@ -2542,14 +2584,14 @@ State 112
 	'>='           fail
 	'&&'           reduce using rule 67
 	'||'           reduce using rule 67
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 	%eof           reduce using rule 67
 
 
-State 113
+State 112
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
@@ -2566,12 +2608,14 @@ State 113
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 66
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 66
 	'}'            reduce using rule 66
-	'.'            shift, and enter state 55
+	'.'            shift, and enter state 56
 	','            reduce using rule 66
 	';'            reduce using rule 66
 	'=='           fail
@@ -2582,14 +2626,14 @@ State 113
 	'>='           fail
 	'&&'           reduce using rule 66
 	'||'           reduce using rule 66
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 	%eof           reduce using rule 66
 
 
-State 114
+State 113
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
@@ -2606,12 +2650,14 @@ State 114
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            reduce using rule 65
-	'['            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            reduce using rule 65
 	'}'            reduce using rule 65
-	'.'            shift, and enter state 55
+	'.'            shift, and enter state 56
 	','            reduce using rule 65
 	';'            reduce using rule 65
 	'=='           fail
@@ -2622,17 +2668,18 @@ State 114
 	'>='           fail
 	'&&'           reduce using rule 65
 	'||'           reduce using rule 65
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 	%eof           reduce using rule 65
 
 
-State 115
+State 114
 
 	LValue -> Expr '.' id .                             (rule 86)
 
+	'('            reduce using rule 86
 	')'            reduce using rule 86
 	'['            reduce using rule 86
 	']'            reduce using rule 86
@@ -2658,7 +2705,7 @@ State 115
 	%eof           reduce using rule 86
 
 
-State 116
+State 115
 
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
@@ -2675,22 +2722,31 @@ State 116
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
 	LValue -> Expr '[' Expr . ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
-	'['            shift, and enter state 54
-	']'            shift, and enter state 134
-	'.'            shift, and enter state 55
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'('            shift, and enter state 54
+	'['            shift, and enter state 55
+	']'            shift, and enter state 135
+	'.'            shift, and enter state 56
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
+
+
+State 116
+
+	FuncCall -> Expr '(' ExprList . ')'                 (rule 88)
+
+	')'            shift, and enter state 134
 
 
 State 117
@@ -2775,22 +2831,24 @@ State 120
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            shift, and enter state 129
-	'['            shift, and enter state 54
-	'.'            shift, and enter state 55
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'['            shift, and enter state 55
+	'.'            shift, and enter state 56
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
 
 State 121
@@ -2810,22 +2868,24 @@ State 121
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            shift, and enter state 128
-	'['            shift, and enter state 54
-	'.'            shift, and enter state 55
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'['            shift, and enter state 55
+	'.'            shift, and enter state 56
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
 
 State 122
@@ -2845,22 +2905,24 @@ State 122
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            shift, and enter state 127
-	'['            shift, and enter state 54
-	'.'            shift, and enter state 55
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'['            shift, and enter state 55
+	'.'            shift, and enter state 56
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
 
 State 123
@@ -2880,22 +2942,24 @@ State 123
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            shift, and enter state 126
-	'['            shift, and enter state 54
-	'.'            shift, and enter state 55
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'['            shift, and enter state 55
+	'.'            shift, and enter state 56
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
 
 State 124
@@ -2915,22 +2979,24 @@ State 124
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
-	'['            shift, and enter state 54
-	'.'            shift, and enter state 55
+	'('            shift, and enter state 54
+	'['            shift, and enter state 55
+	'.'            shift, and enter state 56
 	';'            shift, and enter state 125
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
 
 State 125
@@ -3000,22 +3066,24 @@ State 130
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
-	'['            shift, and enter state 54
-	'.'            shift, and enter state 55
+	'('            shift, and enter state 54
+	'['            shift, and enter state 55
+	'.'            shift, and enter state 56
 	';'            shift, and enter state 155
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
 
 State 131
@@ -3061,8 +3129,36 @@ State 133
 
 State 134
 
+	FuncCall -> Expr '(' ExprList ')' .                 (rule 88)
+
+	'('            reduce using rule 88
+	')'            reduce using rule 88
+	'['            reduce using rule 88
+	']'            reduce using rule 88
+	'}'            reduce using rule 88
+	'.'            reduce using rule 88
+	','            reduce using rule 88
+	';'            reduce using rule 88
+	'=='           reduce using rule 88
+	'!='           reduce using rule 88
+	'<'            reduce using rule 88
+	'<='           reduce using rule 88
+	'>'            reduce using rule 88
+	'>='           reduce using rule 88
+	'&&'           reduce using rule 88
+	'||'           reduce using rule 88
+	'+'            reduce using rule 88
+	'-'            reduce using rule 88
+	'*'            reduce using rule 88
+	'/'            reduce using rule 88
+	%eof           reduce using rule 88
+
+
+State 135
+
 	LValue -> Expr '[' Expr ']' .                       (rule 87)
 
+	'('            reduce using rule 87
 	')'            reduce using rule 87
 	'['            reduce using rule 87
 	']'            reduce using rule 87
@@ -3088,7 +3184,7 @@ State 134
 	%eof           reduce using rule 87
 
 
-State 135
+State 136
 
 	ExprList -> Expr ',' ExprList .                     (rule 98)
 
@@ -3097,36 +3193,11 @@ State 135
 	'}'            reduce using rule 98
 
 
-State 136
-
-	FuncCall -> id '(' ExprList ')' .                   (rule 88)
-
-	')'            reduce using rule 88
-	'['            reduce using rule 88
-	']'            reduce using rule 88
-	'}'            reduce using rule 88
-	'.'            reduce using rule 88
-	','            reduce using rule 88
-	';'            reduce using rule 88
-	'=='           reduce using rule 88
-	'!='           reduce using rule 88
-	'<'            reduce using rule 88
-	'<='           reduce using rule 88
-	'>'            reduce using rule 88
-	'>='           reduce using rule 88
-	'&&'           reduce using rule 88
-	'||'           reduce using rule 88
-	'+'            reduce using rule 88
-	'-'            reduce using rule 88
-	'*'            reduce using rule 88
-	'/'            reduce using rule 88
-	%eof           reduce using rule 88
-
-
 State 137
 
 	ObjCreation -> id '{' ExprList '}' .                (rule 89)
 
+	'('            reduce using rule 89
 	')'            reduce using rule 89
 	'['            reduce using rule 89
 	']'            reduce using rule 89
@@ -3165,24 +3236,26 @@ State 138
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 	DimList -> '[' Expr . ']' DimList                   (rule 91)
 	DimList -> '[' Expr . ']'                           (rule 92)
 
-	'['            shift, and enter state 54
+	'('            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            shift, and enter state 149
-	'.'            shift, and enter state 55
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'.'            shift, and enter state 56
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
 
 State 139
@@ -3282,6 +3355,7 @@ State 149
 	DimList -> '[' Expr ']' . DimList                   (rule 91)
 	DimList -> '[' Expr ']' .                           (rule 92)
 
+	'('            reduce using rule 92
 	')'            reduce using rule 92
 	'['            shift, and enter state 97
 	']'            reduce using rule 92
@@ -3571,22 +3645,24 @@ State 160
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
-	'['            shift, and enter state 54
-	'.'            shift, and enter state 55
+	'('            shift, and enter state 54
+	'['            shift, and enter state 55
+	'.'            shift, and enter state 56
 	';'            shift, and enter state 161
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
 
 State 161
@@ -3686,22 +3762,24 @@ State 166
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
-	'['            shift, and enter state 54
-	'.'            shift, and enter state 55
+	'('            shift, and enter state 54
+	'['            shift, and enter state 55
+	'.'            shift, and enter state 56
 	';'            shift, and enter state 184
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
 
 State 167
@@ -3721,22 +3799,24 @@ State 167
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
-	'['            shift, and enter state 54
+	'('            shift, and enter state 54
+	'['            shift, and enter state 55
 	']'            shift, and enter state 183
-	'.'            shift, and enter state 55
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'.'            shift, and enter state 56
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
 
 State 168
@@ -3779,6 +3859,7 @@ State 171
 
 	DimList -> '[' Expr ']' DimList .                   (rule 91)
 
+	'('            reduce using rule 91
 	')'            reduce using rule 91
 	'['            reduce using rule 91
 	']'            reduce using rule 91
@@ -4035,22 +4116,24 @@ State 188
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            shift, and enter state 189
-	'['            shift, and enter state 54
-	'.'            shift, and enter state 55
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'['            shift, and enter state 55
+	'.'            shift, and enter state 56
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
 
 State 189
@@ -4321,22 +4404,24 @@ State 202
 	Expr -> Expr . '/' Expr                             (rule 74)
 	LValue -> Expr . '.' id                             (rule 86)
 	LValue -> Expr . '[' Expr ']'                       (rule 87)
+	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
+	'('            shift, and enter state 54
 	')'            shift, and enter state 204
-	'['            shift, and enter state 54
-	'.'            shift, and enter state 55
-	'=='           shift, and enter state 57
-	'!='           shift, and enter state 58
-	'<'            shift, and enter state 59
-	'<='           shift, and enter state 60
-	'>'            shift, and enter state 61
-	'>='           shift, and enter state 62
-	'&&'           shift, and enter state 63
-	'||'           shift, and enter state 64
-	'+'            shift, and enter state 65
-	'-'            shift, and enter state 66
-	'*'            shift, and enter state 67
-	'/'            shift, and enter state 68
+	'['            shift, and enter state 55
+	'.'            shift, and enter state 56
+	'=='           shift, and enter state 58
+	'!='           shift, and enter state 59
+	'<'            shift, and enter state 60
+	'<='           shift, and enter state 61
+	'>'            shift, and enter state 62
+	'>='           shift, and enter state 63
+	'&&'           shift, and enter state 64
+	'||'           shift, and enter state 65
+	'+'            shift, and enter state 66
+	'-'            shift, and enter state 67
+	'*'            shift, and enter state 68
+	'/'            shift, and enter state 69
 
 
 State 203
