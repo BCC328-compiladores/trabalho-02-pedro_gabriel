@@ -1,6 +1,6 @@
 // A função soma recebeu mais argumentos que o necessário
 
-func soma(x : int, y : int) : Int {
+func soma(x : int, y : int) : int {
     return x + y;
 }
 
