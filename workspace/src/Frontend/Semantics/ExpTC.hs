@@ -1,6 +1,6 @@
 module Frontend.Semantics.ExpTC where
 
-import Frontend.Parser.Syntax
+import Frontend.Syntax
 import Frontend.Semantics.Basics
 import qualified Data.Map.Strict as M
 

@@ -1,20 +1,21 @@
 module Frontend.Semantics.Basics where
 
-import Frontend.Parser.Syntax
 import qualified Data.Map.Strict as M
 
---- Definindo "Contextos"
+import Frontend.Syntax
 
--- Contexto de Variáveis                    (ID -> Type)
+--- Contexts
+
+-- Vars
 type VarCtx = M.Map ID Type
 
--- Contexto de Definições de Estruturas     (Struct name -> field map)
+-- Structs
 type StructCtx = M.Map ID (M.Map ID Type)
 
--- Assinatura de funções                    (Func name -> (param types, return type))
+-- Functions
 type FuncCtx = M.Map ID ([Type], Type)
 
--- Retorno experado pelo escopo de função
+-- Returns
 type ReturnCtx = Maybe Type
 
 -- Contexto completo
@@ -22,33 +23,37 @@ data Ctx = Ctx{
       varCtx    :: VarCtx,
       structCtx :: StructCtx,
       funcCtx   :: FuncCtx,
-      returnCtx :: ReturnCtx
+      returnCtx :: ReturnCtx,
+      inLoop    :: Bool
     } deriving (Show)
 
 emptyCtx :: Ctx
-emptyCtx = M.empty M.empty M.empty Nothing
+emptyCtx = Ctx { varCtx = M.empty , structCtx = M.empty, funcCtx = M.empty, returnCtx = Nothing, inLoop = False }
 
---- Tipos auxiliares para lidar com erros 
+--- Semantic errors types 
 
-type Expected = Type    -- Tipo esperado
-type Found = Type       -- Tipo retornado
+type Expected = Type
+type Found = Type
 
 -- Erros semânticos
 data SemanticError
-    = IncompatibleTypes Expected Found  -- Tipos incompatíveis 
-    | UndefinedVariable ID              -- Variável indefinida
-    | UndefinedFunction ID              -- Função indefinida
-    | UndefinedStruct   ID              -- Estrutura indefinida
-    | UndefinedField    ID ID           -- struct name, field name      --
-    | ArityMismatch     ID Int Int      -- func name, expected, found   --
-    | NotAnArray        Type            --
-    | NotAStruct        Type            --
-    | NotCallable       Type            --
-    | NotAssignable     Expr            -- lhs is not a valid l-value
-    | ReturnTypeMismatch Expected Found --
-    | MissingReturn     ID              --
-    | DuplicateDecl     ID              -- 
-    | GenericError      String          --
+    = IncompatibleTypes    Expected Found
+    | UndefinedVariable    ID
+    | UndefinedFunction    ID
+    | UndefinedStruct      ID
+    | UndefinedField       ID ID
+    | ArityMismatch        ID Int Int
+    | NotAnArray           Type
+    | NotAStruct           Type
+    | NotCallable          Type
+    | NotAssignable        Expr
+    | ReturnTypeMismatch   Expected Found
+    | MissingReturn        ID
+    | DuplicateDecl        ID
+    | GenericError         String
+    | ContinueOutsideLoop  String
+    | BreakOutsideLoop     String
+    | InvalidMainSignature String 
     deriving (Show)
 
 

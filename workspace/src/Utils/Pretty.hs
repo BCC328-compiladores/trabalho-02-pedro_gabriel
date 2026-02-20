@@ -165,3 +165,7 @@ instance Pretty Expr where
 
     -- To print 1 + (2 + 3)
     pp (Paren e) = text "(" <> pp e <> text ")"
+
+-- To ignore Loc a
+instance Pretty a => Pretty (Loc a) where
+    pp (Loc _ a) = pp a

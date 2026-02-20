@@ -36,20 +36,20 @@ data HappyAbsSyn
         = HappyTerminal (Token)
         | HappyErrorToken Happy_Prelude.Int
         | HappyAbsSyn8 (SL)
-        | HappyAbsSyn9 ([Decl])
-        | HappyAbsSyn10 (Decl)
-        | HappyAbsSyn12 ([Field])
-        | HappyAbsSyn13 (Field)
+        | HappyAbsSyn9 ([Loc Decl])
+        | HappyAbsSyn10 (Loc Decl)
+        | HappyAbsSyn12 ([Loc Field])
+        | HappyAbsSyn13 (Loc Field)
         | HappyAbsSyn15 (Generics)
         | HappyAbsSyn16 ([ID])
-        | HappyAbsSyn17 ([Param])
-        | HappyAbsSyn18 (Param)
+        | HappyAbsSyn17 ([Loc Param])
+        | HappyAbsSyn18 (Loc Param)
         | HappyAbsSyn19 (Maybe Type)
         | HappyAbsSyn20 (Type)
         | HappyAbsSyn22 ([Type])
         | HappyAbsSyn23 (Block)
-        | HappyAbsSyn24 ([Stmt])
-        | HappyAbsSyn25 (Stmt)
+        | HappyAbsSyn24 ([Loc Stmt])
+        | HappyAbsSyn25 (Loc Stmt)
         | HappyAbsSyn26 (Maybe Expr)
         | HappyAbsSyn28 ([(Expr, Block)])
         | HappyAbsSyn29 (Maybe Block)
@@ -230,10 +230,10 @@ happyReduction_9 (_ `HappyStk`
         (HappyAbsSyn12  happy_var_4) `HappyStk`
         _ `HappyStk`
         (HappyTerminal (Token _ (TkID happy_var_2))) `HappyStk`
-        _ `HappyStk`
+        (HappyTerminal happy_var_1) `HappyStk`
         happyRest)
          = HappyAbsSyn10
-                 (Struct happy_var_2 happy_var_4
+                 (Loc (getPos happy_var_1) (Struct happy_var_2 happy_var_4)
         ) `HappyStk` happyRest
 
 happyReduce_10 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
@@ -255,11 +255,11 @@ happyReduce_12 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> H
 happyReduce_12 = happyReduce 4# 5# happyReduction_12
 happyReduction_12 (_ `HappyStk`
         (HappyAbsSyn20  happy_var_3) `HappyStk`
-        _ `HappyStk`
+        (HappyTerminal happy_var_2) `HappyStk`
         (HappyTerminal (Token _ (TkID happy_var_1))) `HappyStk`
         happyRest)
          = HappyAbsSyn13
-                 (Field happy_var_1 happy_var_3
+                 (Loc (getPos happy_var_2) (Field happy_var_1 happy_var_3)
         ) `HappyStk` happyRest
 
 happyReduce_13 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
@@ -272,11 +272,11 @@ happyReduction_13 (_ `HappyStk`
         (HappyAbsSyn17  happy_var_5) `HappyStk`
         _ `HappyStk`
         (HappyTerminal (Token _ (TkID happy_var_3))) `HappyStk`
-        _ `HappyStk`
+        (HappyTerminal happy_var_2) `HappyStk`
         (HappyAbsSyn15  happy_var_1) `HappyStk`
         happyRest)
          = HappyAbsSyn10
-                 (Func happy_var_1 happy_var_3 happy_var_5 happy_var_7 happy_var_9
+                 (Loc (getPos happy_var_2) (Func happy_var_1 happy_var_3 happy_var_5 happy_var_7 happy_var_9)
         ) `HappyStk` happyRest
 
 happyReduce_14 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
@@ -339,10 +339,10 @@ happyReduction_20  =  HappyAbsSyn17
 happyReduce_21 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
 happyReduce_21 = happySpecReduce_3  10# happyReduction_21
 happyReduction_21 (HappyAbsSyn20  happy_var_3)
-        _
+        (HappyTerminal happy_var_2)
         (HappyTerminal (Token _ (TkID happy_var_1)))
          =  HappyAbsSyn18
-                 (Param happy_var_1 (Just happy_var_3)
+                 (Loc (getPos happy_var_2) (Param happy_var_1 (Just happy_var_3))
         )
 happyReduction_21 _ _ _  = notHappyAtAll 
 
@@ -350,7 +350,7 @@ happyReduce_22 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> H
 happyReduce_22 = happySpecReduce_1  10# happyReduction_22
 happyReduction_22 (HappyTerminal (Token _ (TkID happy_var_1)))
          =  HappyAbsSyn18
-                 (Param happy_var_1 Nothing
+                 (Loc (0, 0) (Param happy_var_1 Nothing)
         )
 happyReduction_22 _  = notHappyAtAll 
 
@@ -508,10 +508,10 @@ happyReduction_41 (_ `HappyStk`
         (HappyAbsSyn20  happy_var_4) `HappyStk`
         _ `HappyStk`
         (HappyTerminal (Token _ (TkID happy_var_2))) `HappyStk`
-        _ `HappyStk`
+        (HappyTerminal happy_var_1) `HappyStk`
         happyRest)
          = HappyAbsSyn25
-                 (VarDecl happy_var_2 (Just happy_var_4) (Just happy_var_6)
+                 (Loc (getPos happy_var_1) (VarDecl happy_var_2 (Just happy_var_4) (Just happy_var_6))
         ) `HappyStk` happyRest
 
 happyReduce_42 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
@@ -520,10 +520,10 @@ happyReduction_42 (_ `HappyStk`
         (HappyAbsSyn20  happy_var_4) `HappyStk`
         _ `HappyStk`
         (HappyTerminal (Token _ (TkID happy_var_2))) `HappyStk`
-        _ `HappyStk`
+        (HappyTerminal happy_var_1) `HappyStk`
         happyRest)
          = HappyAbsSyn25
-                 (VarDecl happy_var_2 (Just happy_var_4) (Nothing)
+                 (Loc (getPos happy_var_1) (VarDecl happy_var_2 (Just happy_var_4) (Nothing))
         ) `HappyStk` happyRest
 
 happyReduce_43 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
@@ -532,19 +532,19 @@ happyReduction_43 (_ `HappyStk`
         (HappyAbsSyn32  happy_var_4) `HappyStk`
         _ `HappyStk`
         (HappyTerminal (Token _ (TkID happy_var_2))) `HappyStk`
-        _ `HappyStk`
+        (HappyTerminal happy_var_1) `HappyStk`
         happyRest)
          = HappyAbsSyn25
-                 (VarDecl happy_var_2 (Nothing) (Just happy_var_4)
+                 (Loc (getPos happy_var_1) (VarDecl happy_var_2 (Nothing) (Just happy_var_4))
         ) `HappyStk` happyRest
 
 happyReduce_44 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
 happyReduce_44 = happySpecReduce_3  17# happyReduction_44
 happyReduction_44 _
         (HappyAbsSyn26  happy_var_2)
-        _
+        (HappyTerminal happy_var_1)
          =  HappyAbsSyn25
-                 (Return happy_var_2
+                 (Loc (getPos happy_var_1) (Return happy_var_2)
         )
 happyReduction_44 _ _ _  = notHappyAtAll 
 
@@ -554,10 +554,10 @@ happyReduction_45 (_ `HappyStk`
         _ `HappyStk`
         (HappyAbsSyn32  happy_var_3) `HappyStk`
         _ `HappyStk`
-        _ `HappyStk`
+        (HappyTerminal happy_var_1) `HappyStk`
         happyRest)
          = HappyAbsSyn25
-                 (Print happy_var_3
+                 (Loc (getPos happy_var_1) (Print happy_var_3)
         ) `HappyStk` happyRest
 
 happyReduce_46 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
@@ -566,10 +566,10 @@ happyReduction_46 (_ `HappyStk`
         _ `HappyStk`
         (HappyAbsSyn32  happy_var_3) `HappyStk`
         _ `HappyStk`
-        _ `HappyStk`
+        (HappyTerminal happy_var_1) `HappyStk`
         happyRest)
          = HappyAbsSyn25
-                 (Scan happy_var_3
+                 (Loc (getPos happy_var_1) (Scan happy_var_3)
         ) `HappyStk` happyRest
 
 happyReduce_47 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
@@ -583,18 +583,20 @@ happyReduction_47 _  = notHappyAtAll
 happyReduce_48 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
 happyReduce_48 = happySpecReduce_2  17# happyReduction_48
 happyReduction_48 _
-        _
+        (HappyTerminal happy_var_1)
          =  HappyAbsSyn25
-                 (Continue
+                 (Loc (getPos happy_var_1) Continue
         )
+happyReduction_48 _ _  = notHappyAtAll 
 
 happyReduce_49 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
 happyReduce_49 = happySpecReduce_2  17# happyReduction_49
 happyReduction_49 _
-        _
+        (HappyTerminal happy_var_1)
          =  HappyAbsSyn25
-                 (Break
+                 (Loc (getPos happy_var_1) Break
         )
+happyReduction_49 _ _  = notHappyAtAll 
 
 happyReduce_50 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
 happyReduce_50 = happySpecReduce_1  17# happyReduction_50
@@ -617,7 +619,7 @@ happyReduce_52 = happySpecReduce_2  17# happyReduction_52
 happyReduction_52 _
         (HappyAbsSyn32  happy_var_1)
          =  HappyAbsSyn25
-                 (Exp happy_var_1
+                 (Loc (0, 0) (Exp happy_var_1)
         )
 happyReduction_52 _ _  = notHappyAtAll 
 
@@ -645,10 +647,10 @@ happyReduction_55 ((HappyAbsSyn29  happy_var_9) `HappyStk`
         _ `HappyStk`
         (HappyAbsSyn32  happy_var_3) `HappyStk`
         _ `HappyStk`
-        _ `HappyStk`
+        (HappyTerminal happy_var_1) `HappyStk`
         happyRest)
          = HappyAbsSyn25
-                 (IF happy_var_3 happy_var_6 happy_var_8 happy_var_9
+                 (Loc (getPos happy_var_1) (IF happy_var_3 happy_var_6 happy_var_8 happy_var_9)
         ) `HappyStk` happyRest
 
 happyReduce_56 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
@@ -697,10 +699,10 @@ happyReduction_60 (_ `HappyStk`
         _ `HappyStk`
         (HappyAbsSyn32  happy_var_3) `HappyStk`
         _ `HappyStk`
-        _ `HappyStk`
+        (HappyTerminal happy_var_1) `HappyStk`
         happyRest)
          = HappyAbsSyn25
-                 (While happy_var_3 happy_var_6
+                 (Loc (getPos happy_var_1) (While happy_var_3 happy_var_6)
         ) `HappyStk` happyRest
 
 happyReduce_61 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
@@ -715,10 +717,10 @@ happyReduction_61 (_ `HappyStk`
         _ `HappyStk`
         (HappyAbsSyn32  happy_var_3) `HappyStk`
         _ `HappyStk`
-        _ `HappyStk`
+        (HappyTerminal happy_var_1) `HappyStk`
         happyRest)
          = HappyAbsSyn25
-                 (For happy_var_3 happy_var_5 happy_var_7 happy_var_10
+                 (Loc (getPos happy_var_1) (For happy_var_3 happy_var_5 happy_var_7 happy_var_10)
         ) `HappyStk` happyRest
 
 happyReduce_62 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
@@ -1191,6 +1193,11 @@ parseExpr = happySomeParser where
 
 happySeq = happyDontSeq
 
+
+-- Helper to get the token position
+getPos :: Token -> Pos
+getPos t = case pos t of
+    (l, c) -> (l, c)
 
 -- Error handling function called by Happy when parsing fails.
 parseError :: Token -> Alex a
