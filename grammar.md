@@ -79,7 +79,7 @@ FuncCall -> PrimaryExpr "(" ExprList ")"
 
 ExprList -> Expr "," ExprList | Expr | $\lambda$ 
 
-ObjCreation -> "new" *ID* "{" ExprList "}" | *ID* "{" ExprList "}"
+ObjCreation -> *ID* "{" ExprList "}" | *ID* "{" ExprList "}"
 
 ArrayCreation -> "new" Type DimList
 

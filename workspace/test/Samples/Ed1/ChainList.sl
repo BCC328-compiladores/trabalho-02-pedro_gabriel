@@ -1,35 +1,54 @@
 struct Node {
     value: int;
-    next: Node;
+    next: int; 
+}
+
+struct Arena {
+    memory: Node[100]; 
+    next_free: int[1]; 
 }
 
 struct List {
-    head: Node;
+    head: int; 
 }
 
-func insert(l: List, value: int) : void {
-    let newNode: Node = new Node { value, l.head };
-    l.head = newNode;
+func allocNode(arena: Arena, val: int, nextNode: int) : int {
+    let idx: int = arena.next_free[0];
+    
+    arena.next_free[0] = idx + 1;
+    
+    arena.memory[idx] = Node { val, nextNode };
+    
+    return idx;
 }
 
-func printList(l: List) : void {
-    let current: Node = l.head;
+func insert(arena: Arena, l: List, val: int) : void {
+    let newNodeIdx: int = allocNode(arena, val, l.head);
+    l.head = newNodeIdx;
+}
 
-    while (current != current.next) {
-        print(current.value);
-        current = current.next;
+func printList(arena: Arena, l: List) : void {
+    let curr: int = l.head;
+    
+    while (curr != 0) {
+        print(arena.memory[curr].value);
+        curr = arena.memory[curr].next;
     }
 }
 
 func main() : int {
-    let list: List;
-    list.head = new Node { 0, new Node { 0, 0 } };
+    let memory: Node[100];
+    let next_free: int[1];
+    next_free[0] = 1; 
+    let arena: Arena = Arena { memory, next_free };
+    
+    let list: List = List { 0 };
 
-    insert(list, 10);
-    insert(list, 20);
-    insert(list, 30);
+    insert(arena, list, 10);
+    insert(arena, list, 20);
+    insert(arena, list, 30);
 
-    printList(list);
+    printList(arena, list);
 
     return 0;
 }

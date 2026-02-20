@@ -187,7 +187,7 @@ Stmt :: { Loc Stmt }
     | break ';'                      { Loc (getPos $1) Break }
     | WhileStmt                      { $1 }        -- while
     | ForStmt                        { $1 }        -- for 
-    | Expr ';'                       { Loc (0, 0) (Exp $1) }    -- Dummy position for isolated Expr. 
+    | Expr ';'                       { Loc (getPos $2) (Exp $1) }    -- Dummy position for isolated Expr. 
 
 -- If has something to return
 OptExpr :: { Maybe Expr }

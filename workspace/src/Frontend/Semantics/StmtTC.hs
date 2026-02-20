@@ -129,7 +129,7 @@ tychStmt ctx (Loc pos stmtCore) = do
         -- Var declaretion
         VarDecl vid mTy mInit ->
             -- Verify name
-            if M.member vid (structCtx c) || M.member vid (funcCtx c)
+            if M.member vid (structCtx c) || M.member vid (funcCtx c) || M.member vid (varCtx c)
                 then duplicateDecl c vid
             else
             -- Apply the conversion using the generics of the current context

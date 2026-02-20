@@ -616,10 +616,10 @@ happyReduction_51 _  = notHappyAtAll
 
 happyReduce_52 :: () => Happy_GHC_Exts.Int# -> Token -> Happy_GHC_Exts.Int# -> Happy_IntList -> HappyStk (HappyAbsSyn ) -> Alex (HappyAbsSyn )
 happyReduce_52 = happySpecReduce_2  17# happyReduction_52
-happyReduction_52 _
+happyReduction_52 (HappyTerminal happy_var_2)
         (HappyAbsSyn32  happy_var_1)
          =  HappyAbsSyn25
-                 (Loc (0, 0) (Exp happy_var_1)
+                 (Loc (getPos happy_var_2) (Exp happy_var_1)
         )
 happyReduction_52 _ _  = notHappyAtAll 
 
