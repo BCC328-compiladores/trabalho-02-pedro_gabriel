@@ -1,95 +1,202 @@
 # SL Language Compiler
 
-A compiler for the **SL Language** developed in **Haskell** as part of the **Compiler Construction I (BCC328)** course at the Federal University of Ouro Preto (UFOP).
+A compiler and interpreter for the **SL Language** developed in **Haskell** as part of the **Compiler Construction I (BCC328)** course at the **Federal University of Ouro Preto (UFOP)**.
 
-This project implements the frontend phases (Lexical Analysis, Syntactic Analysis) and includes a Pretty Printer and an Abstract Syntax Tree (AST) visualizer.
+This project implements **frontend**, **semantic analysis**, and **execution** phases of a compiler, including:
+
+* Lexical and syntactic analysis
+* Abstract Syntax Tree (AST) visualization
+* Pretty Printer
+* Static type checking
+* Interpreter
+* Interactive REPL
+
+---
 
 ## Features
 
-* **Lexical Analysis**: Token generation using **Alex**.
-* **Syntactic Analysis**: Parsing and grammar validation using **Happy**.
-* **Abstract Syntax Tree (AST)**: Generation and visualization of the syntax tree.
-* **Pretty Printing**: Reconstructs the source code from the AST.
+### Frontend
+
+* **Lexical Analysis** using **Alex**
+* **Syntactic Analysis** using **Happy**
+* **AST Generation** with tree visualization
+* **Pretty Printing** from AST back to formatted source code
+
+### Semantic Analysis
+
+* **Static Type Checker**
+
+  * Variable, function, and struct validation
+  * Function signatures and generics
+  * Detailed error reporting with line and column
+
+### Execution
+
+* **Interpreter**
+
+  * Executes complete `.sl` programs
+* **REPL (Read–Eval–Print Loop)**
+
+  * Interactive execution of statements
+  * Supports declarations (`func`, `struct`, `forall`)
+  * Type checking before execution
+  * Persistent environment and symbol tables
+
+---
 
 ## Prerequisites
 
 To build and run this project, you need:
 
 * **GHC** (Glasgow Haskell Compiler)
-* **Cabal** (Build system)
-* **Alex** (Lexical analyser generator)
+* **Cabal**
+* **Alex** (Lexical analyzer generator)
 * **Happy** (Parser generator)
+
+---
+
+## Building the Project
+
+```bash
+cabal build
+```
+
+---
 
 ## Usage
 
-The project creates an executable named `sl`. You can run it via `cabal run`.
-
-### Command Syntax
+The project creates an executable named `sl`.
 
 ```bash
 cabal run sl -- [OPTION] [FILE]
 ```
 
-> Note: The double dash `--` is required to separate Cabal flags from program arguments
+> ⚠️ The double dash `--` is required to separate Cabal flags from program arguments.
 
-### Available Options
+---
 
-| Flag | Long Flag | Description |
-| :--- | :--- | :--- |
-| **`-l`** | `--lexer` | Runs the **Lexer** and prints the list of tokens. |
-| **`-pt`** | `--parser` | Runs the **Parser** and prints the **Abstract Syntax Tree (AST)**. |
-| **`-pp`** | `--pretty` | Runs the Parser and **Pretty Prints** the formatted source code. |
-| **`-h`** | `--help` | Shows the help message. |
+## Command-Line Options
 
-**Examples:**
+|  Flag | Long Flag       | Description                                     |
+| ----: | --------------- | ----------------------------------------------- |
+|  `-l` | `--lexer`       | Runs the **Lexer** and prints the token stream  |
+| `-pt` | `--parser`      | Runs the **Parser** and prints the **AST**      |
+| `-pp` | `--pretty`      | Pretty prints the source code from the AST      |
+| `-tc` | `--typecheck`   | Runs **semantic analysis** (type checking only) |
+|  `-i` | `--interpreter` | Executes an SL program                          |
+|  `-r` | `--repl`        | Starts the interactive **REPL**                 |
+|  `-h` | `--help`        | Shows the help message                          |
+
+---
+
+### Examples
 
 ```bash
 cabal run sl -- --lexer input.sl
 cabal run sl -- --parser input.sl
 cabal run sl -- --pretty input.sl
+cabal run sl -- --typecheck input.sl
+cabal run sl -- --interpreter input.sl
+cabal run sl -- --repl
 ```
+
+---
+
+## REPL Mode
+
+By default (or using `--repl`), the compiler starts an interactive shell:
+
+```text
+=================================================
+ Welcome to REPL SL!
+ Type ':q' or ':quit' to exit.
+=================================================
+SL>
+```
+
+### REPL Features
+
+* Supports:
+
+  * Expressions
+  * Statements
+  * Function, struct, and generic declarations
+* Performs **syntax + semantic analysis** before execution
+* Maintains:
+
+  * Type context
+  * Global declarations
+  * Runtime environment
+
+---
+
+## Grammar
+
+The full language grammar is documented in:
+
+```
+../grammar.md
+```
+
+It includes:
+
+* Structs
+* Functions with generics
+* Arrays and function types
+* Control flow (`if`, `elif`, `else`, `while`, `for`)
+* Expressions, operators, and literals
+* type inferece
+
+---
 
 ## Testing
 
-The project includes a test suite defined in `sl_lang.cabal`. To run the automated tests (HUnit):
+The project includes an automated test suite using **HUnit**.
 
 ```bash
-cabal run sl-tests
+cabal run tests
 ```
+
+### Test Coverage
+
+* Lexer unit tests
+* Parser unit tests
+* Sample SL programs
+
+---
 
 ## Project Structure
 
 ```text
 .
 ├── app/
-│   └── Main.hs             # CLI Entry Point (Args parsing & Main execution)
+│   └── Main.hs             # CLI, REPL, Interpreter entry point
 ├── src/
 │   ├── Frontend/
+│   │   ├── Syntax.hs  # AST definitions
 │   │   ├── Lexer/
-│   │   │   ├── SL.x        # Alex lexer definition file
-│   │   │   ├── SL.hs       # Generated lexer code (from Alex)
-│   │   │   └── Token.hs    # Token data type definitions
-│   │   └── Parser/
-│   │       ├── SL.y        # Happy parser definition file (Grammar)
-│   │       ├── SL.hs       # Generated parser code (from Happy)
-│   │       ├── SL.info     # Happy debugging info (states and conflicts)
-│   │       └── Syntax.hs   # Abstract Syntax Tree (AST) definitions
+│   │   ├── Parser/
+│   │   └── Semantics/
+│   ├── Interpreter.hs
 │   └── Utils/
-│       ├── Pretty.hs       # Pretty printer implementation
-│       └── Tree.hs         # AST visualization utilities
+│       ├── Pretty.hs      # Pretty printer
+│       └── Tree.hs        # AST visualization
 ├── test/
-│   ├── Main.hs             # Test suite entry point
-│   ├── Lexer.hs            # Lexer unit tests
-│   ├── Parser.hs           # Parser unit tests
-│   └── Samples/            # Source code examples (.sl) for testing
-│       ├── ex1.sl
-│       ├── ...
-│       └── ex6.sl
-├── sl_lang.cabal           # Cabal project configuration
-└── README.md               # Project documentation
+│   ├── Main.hs
+│   ├── Lexer.hs
+│   ├── Parser.hs
+│   └── Samples/
+│       ├── Assigment/
+│       ├── Force_bounds/
+│       ├── Force_errors/
+│       └── Ed1/
+├── sl_lang.cabal
+└── README.md
 ```
+
+---
 
 ## Authors
 
-  * **Pedro Augusto Sousa Gonçalves**
-  * **Gabriel Carlos Silva**
+* **Pedro Augusto Sousa Gonçalves**
+* **Gabriel Carlos Silva**
