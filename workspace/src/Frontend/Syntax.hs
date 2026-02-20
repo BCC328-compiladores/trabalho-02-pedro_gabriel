@@ -5,6 +5,7 @@ module Frontend.Syntax where
 
 import Data.IORef
 import qualified Data.Map as M
+import Data.List (intercalate)
 
 -- ID to Var, Func, and Struct
 type ID = String
@@ -33,7 +34,18 @@ data Type
     | TyFunc [Type] Type
     -- Generic type for inference --
     | TyVar ID
-    deriving (Eq, Ord, Show)
+    deriving (Eq, Ord)
+
+instance Show Type where
+    show TyInt          = "Int"
+    show TyFloat        = "Float"
+    show TyString       = "String"
+    show TyBool         = "Bool"
+    show TyVoid         = "Void"
+    show (TyArray t _)  = "[" ++ show t ++ "]"
+    show (TyStruct n)   = "Struct<" ++ n ++ ">"
+    show (TyFunc ps r)  = "(" ++ intercalate ", " (map show ps) ++ ") -> " ++ show r
+    show (TyVar v)      = "Generic " ++ v
 
 -- Main , Struct and Func
 

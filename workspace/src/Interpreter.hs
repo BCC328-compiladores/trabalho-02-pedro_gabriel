@@ -335,7 +335,7 @@ handleIncDec g env lvalue delta = do
             return (ValInt n)
         _ -> error "Increment/Decrement only in Int."
 
--- Write a value into an LValue
+-- Write a value into an Value
 -- Var
 writeValue :: Globals -> Env -> Expr -> Value -> IO ()
 writeValue _ env (Var id) val = do
@@ -363,7 +363,7 @@ writeValue g env (arrExpr :@: idxExpr) val = do
             else error "Index outside the limits."
         _ -> error "Invalid assignment in array."
 
-writeValue _ _ _ _ = error "Attempting to assign value to an expression that is not LValue."
+writeValue _ _ _ _ = error "Attempting to assign value to an expression that is not Value."
 
 -- ==========================================
 -- Block & Statement Interpreter

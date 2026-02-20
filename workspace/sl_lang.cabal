@@ -12,9 +12,9 @@ library
         Frontend.Lexer.SL
         Frontend.Syntax
         Frontend.Parser.SL
-        -- Frontend.Semantics.Basics
-        -- Frontend.Semantics.ExpTC
-        -- Frontend.Semantics.SmtTC
+        Frontend.Semantics.Basics
+        Frontend.Semantics.ExprTC
+        Frontend.Semantics.StmtTC
         -- Interpreter
         Utils.Tree
         Utils.Pretty

@@ -4,6 +4,8 @@ import Frontend.Lexer.SL (lexer, runAlex)
 import Frontend.Lexer.Token
 import Frontend.Parser.SL (parseSL)
 import Frontend.Syntax
+import Frontend.Semantics.StmtTC (tychProgram)
+import Frontend.Semantics.Basics (ErrorTypes)
 import Utils.Pretty (printPretty)
 import Utils.Tree (printTree)
 
@@ -16,6 +18,7 @@ data Option
   | Lexer FilePath
   | Parser FilePath
   | Pretty FilePath
+  | TypeCheck FilePath
   deriving (Eq, Show)
 
 main :: IO ()
@@ -32,6 +35,7 @@ runOption opt =
         Just (Lexer file)  -> runLexer file
         Just (Parser file) -> runParser printTree file
         Just (Pretty file) -> runParser printPretty file
+        Just (TypeCheck file) -> runTypeCheck file
         Just Help          -> helpMessage
         Nothing            -> do -- If is a invalid arg
             putStrLn "Error: Invalid command or arguments."
@@ -46,10 +50,32 @@ parseOption args =
             | flag `elem` ["--lexer", "-l"] -> Just $ Lexer arg
             | flag `elem` ["--parser", "-pt"] -> Just $ Parser arg
             | flag `elem` ["--pretty", "-pp"] -> Just $ Pretty arg
+            | flag `elem` ["--typecheck", "-tc"]  -> Just $ TypeCheck arg
         -- 1 arg
         (flag : _)
             | flag `elem` ["--help", "-h"] -> Just Help
         _ -> Nothing
+
+-- Run Lexer, Parser and Type Checker
+runTypeCheck :: FilePath -> IO ()
+runTypeCheck file = do
+    if takeExtension file /= ".sl"
+        then putStrLn $ "Error: File '" ++ file ++ "' must have .sl extension."
+    else do 
+        input <- readFileUtf8 file
+        case runAlex input parseSL of
+            Left err -> putStrLn $ "Parser Error: " ++ err
+            Right ast -> 
+                case tychProgram ast of
+                    Right () -> putStrLn "Semantic Analysis: Success! No type errors found."
+                    Left errs -> do
+                        putStrLn "Semantic Analysis Failed with the following errors:"
+                        mapM_ printSemanticError errs
+
+-- Formata as mensagens de erro do Type Checker com a linha e coluna
+printSemanticError :: (ErrorTypes, Pos) -> IO ()
+printSemanticError (errType, (row, col)) =
+    putStrLn $ "  [Line " ++ show row ++ ", Col " ++ show col ++ "] " ++ show errType
 
 -- Run Parser and print token (if pass printTree print a tree, if pass printPretty print a SL program code )
 runParser :: (SL -> IO ()) -> FilePath ->  IO ()
@@ -158,6 +184,7 @@ helpMessage = putStrLn $ unlines [
     "  -l,  --lexer  <file>    Run the lexical analyzer on the given file.",
     "  -pt, --parser <file>    Run the lexical and parser analyzer on the given file and print the Abstract Syntax Tree (AST).",
     "  -pp, --pretty <file>    Run the lexical and parser analyzer on the given file and pretty-print the source code.",
+    "  -tc, --typecheck <file>    Run the Semantic Analyzer to check for type errors and variable scoping.",
     "  -h,  --help            Show this help message.",
     "",
     "Examples:",
