@@ -163,11 +163,13 @@ tychExpr ctx (FuncCall fexpr args) = do
                                 Just expected -> if expected == vTy then Right m 
                                                  else genericError ctx ("Generics conflict: '" ++ tName ++ "' expected " ++ show expected ++ " but got " ++ show vTy)
                                 Nothing -> Right (M.insert tName vTy m)
-                        buildGenericsMap m (TyArray (TyVar tName) _, TyArray vTy _) =
-                            case M.lookup tName m of
-                                Just expected -> if expected == vTy then Right m
-                                                 else genericError ctx ("Generics conflict in Array: '" ++ tName ++ "'")
-                                Nothing -> Right (M.insert tName vTy m)
+                        buildGenericsMap m (TyArray t1 _, TyArray t2 _) =
+                            buildGenericsMap m (t1, t2)
+                        buildGenericsMap m (TyFunc p1 r1, TyFunc p2 r2) = do
+                            if length p1 /= length p2 then Right m else do
+                                m1 <- foldM buildGenericsMap m (zip p1 p2)
+                                buildGenericsMap m1 (r1, r2)
+
                         buildGenericsMap m _ = Right m
 
                     genMap <- foldM buildGenericsMap M.empty (zip paramTys argTys)
@@ -175,6 +177,7 @@ tychExpr ctx (FuncCall fexpr args) = do
                     -- Resolve os tipos usando o mapa extraído
                     let resolveTy m (TyVar n) = case M.lookup n m of { Just t -> t; Nothing -> TyVar n }
                         resolveTy m (TyArray t size) = TyArray (resolveTy m t) size
+                        resolveTy m (TyFunc ps ret) = TyFunc (map (resolveTy m) ps) (resolveTy m ret)
                         resolveTy _ t = t
 
                     let resolvedParams = map (resolveTy genMap) paramTys
@@ -208,10 +211,13 @@ tychExpr ctx (NewObj sname args) = do
 tychExpr ctx (NewArray elemTy dimExprs) = do
     mapM_ (tychExpr ctx >=> requireEqual ctx TyInt) dimExprs
     
+    -- Transform TyStruct "b" into TyVar "b"
+    let realElemTy = replaceGenerics (genericsCtx ctx) elemTy
+    
     let buildArrayType t 0 = t
         buildArrayType t n = TyArray (buildArrayType t (n - 1)) Nothing
         
-    return (buildArrayType elemTy (length dimExprs))
+    return (buildArrayType realElemTy (length dimExprs))
 
 -- Value Checker
 tychValue :: Ctx -> Expr -> Check Type

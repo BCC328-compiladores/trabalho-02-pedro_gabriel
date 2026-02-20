@@ -168,6 +168,10 @@ defaultValue TyFloat      = return $ ValFloat 0.0
 defaultValue TyString     = return $ ValString ""
 defaultValue TyBool       = return $ ValBool False
 defaultValue TyVoid       = return ValVoid
+defaultValue (TyArray t (Just (LitInt size))) = do
+    def <- defaultValue t
+    ref <- newIORef (replicate size def)
+    return $ ValArray t ref
 defaultValue (TyArray t _) = do
     ref <- newIORef []
     return $ ValArray t ref

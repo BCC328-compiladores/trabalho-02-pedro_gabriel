@@ -26,6 +26,7 @@ data Ctx = Ctx{
       funcCtx    :: FuncCtx,
       returnCtx  :: ReturnCtx,
       inLoop     :: Bool,
+      genericsCtx :: [ID],
       currentPos :: Pos -- (Int, Int) Follow the current row and column.
     } deriving (Show)
 
@@ -35,6 +36,7 @@ emptyCtx = Ctx { varCtx = M.empty ,
                  funcCtx = M.empty, 
                  returnCtx = Nothing, 
                  inLoop = False,
+                 genericsCtx = [],
                  currentPos = (0,0)
                 }
 
@@ -156,3 +158,12 @@ checkAssign ctx (TyArray t1 (Just _)) (TyArray t2 Nothing) = do
     _ <- requireEqual ctx t1 t2
     return (TyArray t1 Nothing)
 checkAssign ctx e f = requireEqual ctx e f
+
+-- Helper to convert TyStruct to TyVar based on the list of Generics
+replaceGenerics :: [ID] -> Type -> Type
+replaceGenerics gens (TyStruct name) 
+    | name `elem` gens = TyVar name
+replaceGenerics gens (TyArray t size) = TyArray (replaceGenerics gens t) size
+replaceGenerics gens (TyFunc params ret) = 
+    TyFunc (map (replaceGenerics gens) params) (replaceGenerics gens ret)
+replaceGenerics _ t = t
