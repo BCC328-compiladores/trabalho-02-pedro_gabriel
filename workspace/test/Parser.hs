@@ -161,8 +161,8 @@ testLoops = TestCase $ do
     let expWhile  = [l $ While (LitBool True) (Block [l $ Exp (PostInc (Var "x")), l Break])]
     
     -- For
-    let codeFor   = "for(i=0; i<10; i++) { print(i); continue; }"
-    let init      = Var "i" := LitInt 0
+    let codeFor   = "for(let i = 0; i<10; i++) { print(i); continue; }"
+    let init      = VarDecl "i" Nothing $ Just $ LitInt 0
     let cond      = Var "i" :<: LitInt 10
     let step      = PostInc (Var "i")
     let blockFor  = Block [l $ Print (Var "i"), l Continue]

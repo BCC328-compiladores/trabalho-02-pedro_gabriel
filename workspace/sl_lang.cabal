@@ -59,6 +59,7 @@ test-suite sl-tests
     other-modules:
         Lexer
         Parser
+        Semantic
 
     build-depends:
         , base
