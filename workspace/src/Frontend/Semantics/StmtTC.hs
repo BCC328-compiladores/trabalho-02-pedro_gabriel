@@ -190,12 +190,12 @@ tychStmt ctx (Loc pos stmtCore) = do
             return c
         
         -- For
-        For initE condE stepE body -> do
-            _ <- tychExpr c initE
-            tc <- tychExpr c condE
-            _ <- requireEqual c TyBool tc
-            _ <- tychExpr c stepE
-            let loopCtx = c { inLoop = True }
+        For initStmt condE stepE body -> do
+            ctxComI <- tychStmt c (Loc pos initStmt)
+            tc <- tychExpr ctxComI condE
+            _ <- requireEqual ctxComI TyBool tc
+            _ <- tychExpr ctxComI stepE
+            let loopCtx = ctxComI { inLoop = True }
             void (tychBlock loopCtx body)
             return c
         

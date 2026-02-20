@@ -216,7 +216,7 @@ WhileStmt :: { Loc Stmt }
 -- For
 
 ForStmt :: { Loc Stmt }
-    : for '(' Expr ';' Expr ';' Expr ')' '{' Block '}' { Loc (getPos $1) (For $3 $5 $7 $10) }
+    : for '(' Stmt Expr ';' Expr ')' '{' Block '}' { Loc (getPos $1) (For (case $3 of Loc _ s -> s) $4 $6 $9) }
 
 -- Expr
 

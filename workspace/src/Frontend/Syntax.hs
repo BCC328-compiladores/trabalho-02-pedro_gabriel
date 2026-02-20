@@ -71,7 +71,7 @@ data Stmt
     | Continue
     | Break
     | While Expr Block
-    | For Expr Expr Expr Block
+    | For Stmt Expr Expr Block
     | Exp Expr  -- Isolated expression
     deriving (Eq, Ord, Show)
 

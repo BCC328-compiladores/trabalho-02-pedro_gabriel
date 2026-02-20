@@ -67,7 +67,7 @@ Grammar
 	OptElse -> else '{' Block '}'                      (58)
 	OptElse ->                                         (59)
 	WhileStmt -> while '(' Expr ')' '{' Block '}'      (60)
-	ForStmt -> for '(' Expr ';' Expr ';' Expr ')' '{' Block '}'   (61)
+	ForStmt -> for '(' Stmt Expr ';' Expr ')' '{' Block '}'   (61)
 	Expr -> LValue '=' Expr                            (62)
 	Expr -> Expr '||' Expr                             (63)
 	Expr -> Expr '&&' Expr                             (64)
@@ -993,7 +993,7 @@ State 40
 
 State 41
 
-	ForStmt -> for . '(' Expr ';' Expr ';' Expr ')' '{' Block '}'    (rule 61)
+	ForStmt -> for . '(' Stmt Expr ';' Expr ')' '{' Block '}'    (rule 61)
 
 	'('            shift, and enter state 44
 
@@ -1014,8 +1014,17 @@ State 43
 
 State 44
 
-	ForStmt -> for '(' . Expr ';' Expr ';' Expr ')' '{' Block '}'    (rule 61)
+	ForStmt -> for '(' . Stmt Expr ';' Expr ')' '{' Block '}'    (rule 61)
 
+	continue       shift, and enter state 33
+	break          shift, and enter state 34
+	let            shift, and enter state 35
+	return         shift, and enter state 36
+	print          shift, and enter state 37
+	scan           shift, and enter state 38
+	if             shift, and enter state 39
+	while          shift, and enter state 40
+	for            shift, and enter state 41
 	new            shift, and enter state 18
 	id             shift, and enter state 19
 	int_lit        shift, and enter state 20
@@ -1027,7 +1036,11 @@ State 44
 	'!'            shift, and enter state 26
 	'-'            shift, and enter state 27
 
-	Expr           goto state 124
+	Stmt           goto state 124
+	IfStmt         goto state 29
+	WhileStmt      goto state 30
+	ForStmt        goto state 31
+	Expr           goto state 32
 	LValue         goto state 13
 	FuncCall       goto state 14
 	ObjCreation    goto state 15
@@ -2964,7 +2977,29 @@ State 123
 
 State 124
 
-	ForStmt -> for '(' Expr . ';' Expr ';' Expr ')' '{' Block '}'    (rule 61)
+	ForStmt -> for '(' Stmt . Expr ';' Expr ')' '{' Block '}'    (rule 61)
+
+	new            shift, and enter state 18
+	id             shift, and enter state 19
+	int_lit        shift, and enter state 20
+	float_lit      shift, and enter state 21
+	str_lit        shift, and enter state 22
+	bool_lit       shift, and enter state 23
+	'('            shift, and enter state 24
+	'['            shift, and enter state 25
+	'!'            shift, and enter state 26
+	'-'            shift, and enter state 27
+
+	Expr           goto state 125
+	LValue         goto state 13
+	FuncCall       goto state 14
+	ObjCreation    goto state 15
+	ArrayCreation  goto state 16
+	Literals       goto state 17
+
+State 125
+
+	ForStmt -> for '(' Stmt Expr . ';' Expr ')' '{' Block '}'    (rule 61)
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
 	Expr -> Expr . '==' Expr                            (rule 65)
@@ -2984,7 +3019,7 @@ State 124
 	'('            shift, and enter state 54
 	'['            shift, and enter state 55
 	'.'            shift, and enter state 56
-	';'            shift, and enter state 125
+	';'            shift, and enter state 160
 	'=='           shift, and enter state 58
 	'!='           shift, and enter state 59
 	'<'            shift, and enter state 60
@@ -2998,28 +3033,6 @@ State 124
 	'*'            shift, and enter state 68
 	'/'            shift, and enter state 69
 
-
-State 125
-
-	ForStmt -> for '(' Expr ';' . Expr ';' Expr ')' '{' Block '}'    (rule 61)
-
-	new            shift, and enter state 18
-	id             shift, and enter state 19
-	int_lit        shift, and enter state 20
-	float_lit      shift, and enter state 21
-	str_lit        shift, and enter state 22
-	bool_lit       shift, and enter state 23
-	'('            shift, and enter state 24
-	'['            shift, and enter state 25
-	'!'            shift, and enter state 26
-	'-'            shift, and enter state 27
-
-	Expr           goto state 160
-	LValue         goto state 13
-	FuncCall       goto state 14
-	ObjCreation    goto state 15
-	ArrayCreation  goto state 16
-	Literals       goto state 17
 
 State 126
 
@@ -3630,7 +3643,29 @@ State 159
 
 State 160
 
-	ForStmt -> for '(' Expr ';' Expr . ';' Expr ')' '{' Block '}'    (rule 61)
+	ForStmt -> for '(' Stmt Expr ';' . Expr ')' '{' Block '}'    (rule 61)
+
+	new            shift, and enter state 18
+	id             shift, and enter state 19
+	int_lit        shift, and enter state 20
+	float_lit      shift, and enter state 21
+	str_lit        shift, and enter state 22
+	bool_lit       shift, and enter state 23
+	'('            shift, and enter state 24
+	'['            shift, and enter state 25
+	'!'            shift, and enter state 26
+	'-'            shift, and enter state 27
+
+	Expr           goto state 161
+	LValue         goto state 13
+	FuncCall       goto state 14
+	ObjCreation    goto state 15
+	ArrayCreation  goto state 16
+	Literals       goto state 17
+
+State 161
+
+	ForStmt -> for '(' Stmt Expr ';' Expr . ')' '{' Block '}'    (rule 61)
 	Expr -> Expr . '||' Expr                            (rule 63)
 	Expr -> Expr . '&&' Expr                            (rule 64)
 	Expr -> Expr . '==' Expr                            (rule 65)
@@ -3648,9 +3683,9 @@ State 160
 	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
 
 	'('            shift, and enter state 54
+	')'            shift, and enter state 188
 	'['            shift, and enter state 55
 	'.'            shift, and enter state 56
-	';'            shift, and enter state 161
 	'=='           shift, and enter state 58
 	'!='           shift, and enter state 59
 	'<'            shift, and enter state 60
@@ -3664,28 +3699,6 @@ State 160
 	'*'            shift, and enter state 68
 	'/'            shift, and enter state 69
 
-
-State 161
-
-	ForStmt -> for '(' Expr ';' Expr ';' . Expr ')' '{' Block '}'    (rule 61)
-
-	new            shift, and enter state 18
-	id             shift, and enter state 19
-	int_lit        shift, and enter state 20
-	float_lit      shift, and enter state 21
-	str_lit        shift, and enter state 22
-	bool_lit       shift, and enter state 23
-	'('            shift, and enter state 24
-	'['            shift, and enter state 25
-	'!'            shift, and enter state 26
-	'-'            shift, and enter state 27
-
-	Expr           goto state 188
-	LValue         goto state 13
-	FuncCall       goto state 14
-	ObjCreation    goto state 15
-	ArrayCreation  goto state 16
-	Literals       goto state 17
 
 State 162
 
@@ -4101,47 +4114,48 @@ State 187
 
 State 188
 
-	ForStmt -> for '(' Expr ';' Expr ';' Expr . ')' '{' Block '}'    (rule 61)
-	Expr -> Expr . '||' Expr                            (rule 63)
-	Expr -> Expr . '&&' Expr                            (rule 64)
-	Expr -> Expr . '==' Expr                            (rule 65)
-	Expr -> Expr . '!=' Expr                            (rule 66)
-	Expr -> Expr . '<' Expr                             (rule 67)
-	Expr -> Expr . '<=' Expr                            (rule 68)
-	Expr -> Expr . '>' Expr                             (rule 69)
-	Expr -> Expr . '>=' Expr                            (rule 70)
-	Expr -> Expr . '+' Expr                             (rule 71)
-	Expr -> Expr . '-' Expr                             (rule 72)
-	Expr -> Expr . '*' Expr                             (rule 73)
-	Expr -> Expr . '/' Expr                             (rule 74)
-	LValue -> Expr . '.' id                             (rule 86)
-	LValue -> Expr . '[' Expr ']'                       (rule 87)
-	FuncCall -> Expr . '(' ExprList ')'                 (rule 88)
+	ForStmt -> for '(' Stmt Expr ';' Expr ')' . '{' Block '}'    (rule 61)
 
-	'('            shift, and enter state 54
-	')'            shift, and enter state 189
-	'['            shift, and enter state 55
-	'.'            shift, and enter state 56
-	'=='           shift, and enter state 58
-	'!='           shift, and enter state 59
-	'<'            shift, and enter state 60
-	'<='           shift, and enter state 61
-	'>'            shift, and enter state 62
-	'>='           shift, and enter state 63
-	'&&'           shift, and enter state 64
-	'||'           shift, and enter state 65
-	'+'            shift, and enter state 66
-	'-'            shift, and enter state 67
-	'*'            shift, and enter state 68
-	'/'            shift, and enter state 69
+	'{'            shift, and enter state 189
 
 
 State 189
 
-	ForStmt -> for '(' Expr ';' Expr ';' Expr ')' . '{' Block '}'    (rule 61)
+	ForStmt -> for '(' Stmt Expr ';' Expr ')' '{' . Block '}'    (rule 61)
 
-	'{'            shift, and enter state 199
+	continue       shift, and enter state 33
+	break          shift, and enter state 34
+	let            shift, and enter state 35
+	return         shift, and enter state 36
+	print          shift, and enter state 37
+	scan           shift, and enter state 38
+	if             shift, and enter state 39
+	while          shift, and enter state 40
+	for            shift, and enter state 41
+	new            shift, and enter state 18
+	id             shift, and enter state 19
+	int_lit        shift, and enter state 20
+	float_lit      shift, and enter state 21
+	str_lit        shift, and enter state 22
+	bool_lit       shift, and enter state 23
+	'('            shift, and enter state 24
+	'['            shift, and enter state 25
+	'}'            reduce using rule 40
+	'!'            shift, and enter state 26
+	'-'            shift, and enter state 27
 
+	Block          goto state 199
+	StmtList       goto state 163
+	Stmt           goto state 164
+	IfStmt         goto state 29
+	WhileStmt      goto state 30
+	ForStmt        goto state 31
+	Expr           goto state 32
+	LValue         goto state 13
+	FuncCall       goto state 14
+	ObjCreation    goto state 15
+	ArrayCreation  goto state 16
+	Literals       goto state 17
 
 State 190
 
@@ -4306,47 +4320,36 @@ State 198
 
 State 199
 
-	ForStmt -> for '(' Expr ';' Expr ';' Expr ')' '{' . Block '}'    (rule 61)
+	ForStmt -> for '(' Stmt Expr ';' Expr ')' '{' Block . '}'    (rule 61)
 
-	continue       shift, and enter state 33
-	break          shift, and enter state 34
-	let            shift, and enter state 35
-	return         shift, and enter state 36
-	print          shift, and enter state 37
-	scan           shift, and enter state 38
-	if             shift, and enter state 39
-	while          shift, and enter state 40
-	for            shift, and enter state 41
-	new            shift, and enter state 18
-	id             shift, and enter state 19
-	int_lit        shift, and enter state 20
-	float_lit      shift, and enter state 21
-	str_lit        shift, and enter state 22
-	bool_lit       shift, and enter state 23
-	'('            shift, and enter state 24
-	'['            shift, and enter state 25
-	'}'            reduce using rule 40
-	'!'            shift, and enter state 26
-	'-'            shift, and enter state 27
+	'}'            shift, and enter state 200
 
-	Block          goto state 200
-	StmtList       goto state 163
-	Stmt           goto state 164
-	IfStmt         goto state 29
-	WhileStmt      goto state 30
-	ForStmt        goto state 31
-	Expr           goto state 32
-	LValue         goto state 13
-	FuncCall       goto state 14
-	ObjCreation    goto state 15
-	ArrayCreation  goto state 16
-	Literals       goto state 17
 
 State 200
 
-	ForStmt -> for '(' Expr ';' Expr ';' Expr ')' '{' Block . '}'    (rule 61)
+	ForStmt -> for '(' Stmt Expr ';' Expr ')' '{' Block '}' .    (rule 61)
 
-	'}'            shift, and enter state 206
+	continue       reduce using rule 61
+	break          reduce using rule 61
+	let            reduce using rule 61
+	return         reduce using rule 61
+	print          reduce using rule 61
+	scan           reduce using rule 61
+	if             reduce using rule 61
+	while          reduce using rule 61
+	for            reduce using rule 61
+	new            reduce using rule 61
+	id             reduce using rule 61
+	int_lit        reduce using rule 61
+	float_lit      reduce using rule 61
+	str_lit        reduce using rule 61
+	bool_lit       reduce using rule 61
+	'('            reduce using rule 61
+	'['            reduce using rule 61
+	'}'            reduce using rule 61
+	'!'            reduce using rule 61
+	'-'            reduce using rule 61
+	%eof           reduce using rule 61
 
 
 State 201
@@ -4438,44 +4441,17 @@ State 204
 
 	ElifList -> elif '(' Expr ')' . '{' Block '}' ElifList    (rule 56)
 
-	'{'            shift, and enter state 208
+	'{'            shift, and enter state 207
 
 
 State 205
 
 	OptElse -> else '{' Block . '}'                     (rule 58)
 
-	'}'            shift, and enter state 207
+	'}'            shift, and enter state 206
 
 
 State 206
-
-	ForStmt -> for '(' Expr ';' Expr ';' Expr ')' '{' Block '}' .    (rule 61)
-
-	continue       reduce using rule 61
-	break          reduce using rule 61
-	let            reduce using rule 61
-	return         reduce using rule 61
-	print          reduce using rule 61
-	scan           reduce using rule 61
-	if             reduce using rule 61
-	while          reduce using rule 61
-	for            reduce using rule 61
-	new            reduce using rule 61
-	id             reduce using rule 61
-	int_lit        reduce using rule 61
-	float_lit      reduce using rule 61
-	str_lit        reduce using rule 61
-	bool_lit       reduce using rule 61
-	'('            reduce using rule 61
-	'['            reduce using rule 61
-	'}'            reduce using rule 61
-	'!'            reduce using rule 61
-	'-'            reduce using rule 61
-	%eof           reduce using rule 61
-
-
-State 207
 
 	OptElse -> else '{' Block '}' .                     (rule 58)
 
@@ -4502,7 +4478,7 @@ State 207
 	%eof           reduce using rule 58
 
 
-State 208
+State 207
 
 	ElifList -> elif '(' Expr ')' '{' . Block '}' ElifList    (rule 56)
 
@@ -4527,7 +4503,7 @@ State 208
 	'!'            shift, and enter state 26
 	'-'            shift, and enter state 27
 
-	Block          goto state 209
+	Block          goto state 208
 	StmtList       goto state 163
 	Stmt           goto state 164
 	IfStmt         goto state 29
@@ -4540,14 +4516,14 @@ State 208
 	ArrayCreation  goto state 16
 	Literals       goto state 17
 
-State 209
+State 208
 
 	ElifList -> elif '(' Expr ')' '{' Block . '}' ElifList    (rule 56)
 
-	'}'            shift, and enter state 210
+	'}'            shift, and enter state 209
 
 
-State 210
+State 209
 
 	ElifList -> elif '(' Expr ')' '{' Block '}' . ElifList    (rule 56)
 
@@ -4575,9 +4551,9 @@ State 210
 	'-'            reduce using rule 57
 	%eof           reduce using rule 57
 
-	ElifList       goto state 211
+	ElifList       goto state 210
 
-State 211
+State 210
 
 	ElifList -> elif '(' Expr ')' '{' Block '}' ElifList .    (rule 56)
 
@@ -4611,4 +4587,4 @@ Grammar Totals
 Number of rules: 101
 Number of terminals: 52
 Number of non-terminals: 36
-Number of states: 212
+Number of states: 211
