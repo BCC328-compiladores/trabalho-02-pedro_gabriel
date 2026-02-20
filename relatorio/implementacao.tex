@@ -1,0 +1,38 @@
+
+O objetivo desta etapa do trabalho consiste no desenvolvimento do analisador semântico e do interpretador do compilador para a linguagem SL. A divisão das tarefas foi definida considerando a afinidade e a familiaridade técnica de cada integrante com as respectivas etapas do projeto. Enquanto Pedro ficou responsável pela implementação do módulo do interpretador, Gabriel concentrou-se no desenvolvimento do analisador semântico.
+
+Durante o desenvolvimento do interpretador, foi identificado um problema conceitual na gramática previamente definida no analisador sintático, uma vez que esta não contemplava o comando \textbf{Scan}, nem a definição dos tipos \textbf{Values}. Esses tipos são necessários para realizar a conversão de literais em representações internas compatíveis, permitindo que tanto o analisador semântico quanto o interpretador reconheçam e manipulem corretamente os valores durante a execução do programa.
+
+Outro ponto observado ao longo do processo de refatoração foi a ausência da operação de acesso ao tamanho de arrays por meio da notação \textbf{a.size}. Essa limitação comprometia a consistência entre as etapas do compilador. Após a devida correção, passou a ser possível que tanto o analisador semântico quanto o interpretador reconheçam e validem adequadamente essa chamada, garantindo maior coerência entre a estrutura sintática e o comportamento esperado na execução.
+
+Para o desenvolvimento do analisador semântico, foram utilizados como referência os arquivos do repositório do GitHub \textbf{bcc328/src/Imp}, do professor Rodrigo Geraldo. A primeira versão do analisador foi construída a partir de uma adaptação e ampliação desse modelo de exemplo, preservando, contudo, a organização estrutural dos arquivos e a lógica interna originalmente proposta.
+
+O contexto, anteriormente representado pelo tipo \textbf{Ctx}, foi expandido com o objetivo de acomodar subcontextos específicos, permitindo uma modelagem mais precisa das diferentes categorias de informação necessárias à análise semântica. Para isso, foram introduzidos os campos \textbf{varCtx}, responsável por armazenar variáveis e funções tratadas como valores no escopo corrente; \textbf{structCtx}, destinado às definições de estruturas; \textbf{funcCtx}, que mantém as assinaturas de funções declaradas; e \textbf{returnCtx}, utilizado para registrar o tipo de retorno esperado no escopo atual.
+
+Essa reorganização do contexto possibilitou uma verificação semântica mais consistente e estruturada, garantindo que cada categoria de elemento fosse validada de acordo com suas regras específicas e reduzindo ambiguidades durante o processo de análise.
+
+Após uma reunião, foi definido que Pedro ficaria responsável por unificar o analisador semântico ao interpretador, com o objetivo de evitar redundâncias estruturais e inconsistências entre os módulos. Essa decisão implicou um processo de refatoração do código já existente, bem como a identificação e correção de inconsistências e erros previamente não observados no analisador semântico.
+
+Paralelamente, Gabriel concentrou-se na elaboração de testes para validação dos módulos desenvolvidos, buscando assegurar a correção e a estabilidade das funcionalidades implementadas, e eliminar redundâncias e código não utilizado. Além disso, ficou sob sua responsabilidade a redação do relatório, documentando as decisões tomadas e os desafios enfrentados ao longo do desenvolvimento.
+
+Durante a fase de testes, foram identificadas algumas deficiências no analisador semântico, incluindo situações em que determinados erros não eram devidamente detectados, bem como a ausência de informações sobre a posição em que tais erros ocorriam. Essas limitações comprometiam a qualidade das mensagens de diagnóstico e dificultavam o processo de depuração.
+
+Após a identificação dessas inconsistências, foram realizadas as devidas correções, aprimorando os mecanismos de verificação e garantindo a adequada sinalização dos erros, acompanhada da respectiva indicação de sua localização no código-fonte.
+
+Durante o desenvolvimento do projeto, foi realizada uma modificação na estrutura do parser. Inicialmente, o processo de análise estava restrito à leitura e execução do bloco principal (\textit{main}), o que limitava a forma como o programa era estruturado. Após a reformulação, o parser passou a reconhecer e processar definições de funções como ponto inicial da análise, permitindo que a execução seja organizada a partir dessas declarações. Essa alteração contribuiu para uma arquitetura mais modular e coerente, aproximando o comportamento do compilador ao modelo tradicional de linguagens estruturadas por funções.
+
+Durante o processo de refatoração, o tipo \textbf{Ctx} foi novamente estendido com a introdução de novos campos auxiliares. Foi adicionado o campo \textbf{inLoop}, responsável por indicar se o ambiente atual se encontra no interior de uma estrutura de repetição, possibilitando a validação adequada de comandos cuja utilização depende desse contexto específico.
+Além disso, foi incorporado o campo \textbf{generics}, destinado a armazenar a lista de parâmetros ou atributos genéricos visíveis no escopo corrente. Essa ampliação permitiu um controle mais rigoroso sobre a utilização de tipos genéricos, evitando usos indevidos fora do escopo apropriado.
+
+
+Além dos requisitos originalmente estabelecidos para esta etapa do trabalho, foram implementadas funcionalidades adicionais:
+
+\begin{itemize}
+    \item \textbf{Inferência de tipos}: incorporada ao processo de análise semântica, permitindo a dedução automática de tipos em determinadas declarações, reduzindo a necessidade de anotações explícitas.
+
+    \item \textbf{Funções de primeira classe}: possibilitando que funções sejam tratadas como valores, podendo ser passadas como parâmetro para outras funções ou retornadas como resultado de chamadas, ampliando o poder de abstração da linguagem.
+
+    \item \textbf{REPL}: implementação de um interpretador interativo, inspirado no ambiente do GHCI da linguagem Haskell, permitindo a execução incremental de comandos, encerrando a execução após um erro.
+\end{itemize}
+
+\newpage

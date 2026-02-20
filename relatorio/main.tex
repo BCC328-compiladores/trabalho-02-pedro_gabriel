@@ -7,8 +7,11 @@
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{float}
+\usepackage{pdfpages}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{verbatim}
 
 \geometry{a4paper, left=3cm, right=2cm, top=3cm, bottom=2cm}
 
@@ -58,58 +61,20 @@
 \maketitle
 
 \begin{abstract}
-Este trabalho apresenta o desenvolvimento das etapas de análise léxica e sintática de um compilador para a linguagem \textit{SL}. O projeto foi desenvolvido como requisito parcial da disciplina de Construção de Compiladores I. A implementação utilizou a linguagem de programação \texttt{Haskell} em conjunto com as ferramentas geradoras \texttt{Alex} e \textit{Happy}. O analisador resultante é capaz de identificar tokens válidos e verificar a conformidade do código fonte com a gramática livre de contexto especificada, reportando erros léxicos e sintáticos quando encontrados.
+Este trabalho apresenta o desenvolvimento das etapas de Análise semântica e Interpretador de um compilador desenvolvido na linguagem Haskell, para a linguagem SL, e consiste na segunda etapa do trabalho prático de Construção de Compiladores. Este documento descreve o processo de implementação desta etapa do compilador, juntamente com a divisão do trabalho entre os participantes e os recursos de LLM utilizados.
 \end{abstract}
 
 \clearpage\newpage
 \tableofcontents
 \clearpage\newpage
 
-\section{Introdução}
-\input{sections/intro.tex}
-\clearpage\newpage
 
+\section{Implementação}
+\input{Implementacao.tex}
 
+\section{LLM}
+\input{prompts.tex}
 
-\section{Metodologia}
-\subsection{Estrutura sintática de SL}
-\input{sections/Metodologia/Estrutura sintática}
-
-\subsection{Sistema de tipos para SL}
-\input{sections/Metodologia/Sistemas de tipos}
-
-\subsection{Inferência de tipos para SL}
-\input{sections/Metodologia/Inferência de tipos}
-
-\subsection{Semântica operacional para SL}
-\input{sections/Metodologia/Semantica}
-
-\clearpage\newpage
-
-\section{Arquitetura do Compilador}
-
-\subsection{Gramatica do SL}
-\input{sections/Arquitetura/Gramatica}
-
-\subsection{Análise léxica}
-\input{sections/Arquitetura/AnaliseLéxica}
-
-\subsection{Análise Sintática}
-\input{sections/Arquitetura/Arvore de sintaxe abstrata}
-
-\section{Resultados e Discussão}
-
-\subsection{Instruções de Uso}
-\input{sections/Testes/Insturuções}
-
-\subsection{Testes Realizados}
-\input{sections/Testes/Testes Realizados}
-
-\subsection{Limitações}
-\input{sections/Testes/Limitações}
-
-\section{Conclusão}
-\input{sections/Conclusão}
 
 \section{Referências}
 
@@ -123,5 +88,9 @@ Appel, A. W. (1998). \emph{Modern Compiler Implementation in ML}. Cambridge Univ
 \bibitem{webassembly2023}
 WebAssembly Community Group. (2023). \emph{WebAssembly Specification}.
 \end{thebibliography}
+
+\section{Gramática final}
+\includepdf[pages=-]{grammar.pdf}
+
 
 \end{document}

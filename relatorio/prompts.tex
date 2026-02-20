@@ -1,0 +1,133 @@
+
+
+Durante o desenvolvimento deste projeto, foram utilizados modelos de LLM (ChatGpt, Claude e Google Gemini) para pesquisa, dúvidas e revisão de código, este campo tem como objetivo transparecer o uso dessas ferramentas no projeto.
+
+Durante o desenvolvimento deste projeto, foram utilizados modelos de linguagem (LLMs), tais como ChatGPT, Claude e Google Gemini, como ferramentas auxiliares de apoio. Esses recursos foram empregados principalmente para esclarecimento de dúvidas conceituais, pesquisa complementar sobre determinados tópicos, revisão pontual de trechos de código e sugestões de melhoria estrutural.
+
+Ressalta-se que tais ferramentas foram utilizadas como suporte ao processo de aprendizagem e desenvolvimento, não substituindo a compreensão e implementação realizadas pelos integrantes do grupo. A inclusão desta seção tem como objetivo garantir transparência quanto ao uso dessas tecnologias no decorrer do projeto.
+
+\subsection{ChatGpt}
+
+Foi utilizado para gerar alguns dos códigos Sl para os testes de erro:
+
+\textbf{Consulta: [Arquivo grammar.pdf]}
+
+Considerando a gramática deste arquivo, gere um código simples que pode ser reconhecido por essa gramática.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{gencod1.png}
+    \caption{Algoritmo simples, não utilizado}
+    \label{fig:placeholder}
+\end{figure}
+
+\textbf{Consulta Seguinte: }
+
+\begin{figure} [H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{gencod2.png}
+    \caption{Algoritmo pilha}
+    \label{fig:placeholder}
+\end{figure}
+
+Desta mesma maneira, foram gerados os códigos de exemplo de fila, quicksort, lista encadeada, arvore binária, bubblesort, tabela hash e alguns erros que deveriam ser retornados.
+
+
+\subsection{Claude:}
+\textbf{Gabriel:}
+
+Dúvida inicial sobre implementação do trabalho.
+
+\textbf{Consulta:}
+Descreva as etapas necessárias para implementar um analisador semântico e um interpretador para um projeto de compilador feito em Haskell. Considere que a gramática formal, o analisador léxico e o analisador sintático já foram implementados, usando Happy. Deve-se implementar o sistema de tipos da linguagem SL (linguagem que estamos utilizando) e também sua semântica operacional. Esses dois itens servirão como especificação do analisador semântico e do interpretador. As verificações semânticas devem incluir compatibilidade de tipos em operações, declaração única de identificadores no mesmo escopo, chamadas de função com número e tipos corretos de argumentos e acesso válido a campos de registros e elementos de arranjos.
+Não implemente código, apenas liste os passos que devem ser realizados.
+
+\textbf{Resposta:}
+Fase 1: Definição do Sistema de Tipos
+Primeiramente, é necessário especificar formalmente o sistema de tipos da linguagem SL. Isso envolve definir os tipos de dados algébricos em Haskell que representarão os tipos da linguagem, incluindo tipos primitivos (inteiros, booleanos, caracteres), tipos compostos (arranjos, registros), tipos de função e possivelmente um tipo para representar erros de tipo. Deve-se também estabelecer as regras de equivalência e compatibilidade entre tipos, determinando quando dois tipos são considerados iguais ou compatíveis em diferentes contextos.
+
+Fase 2: Especificação da Semântica Operacional
+A semântica operacional define como os programas são executados. Nesta etapa, é preciso especificar formalmente as regras de avaliação para cada construção da linguagem, incluindo expressões aritméticas e lógicas, comandos de controle de fluxo, declarações e atribuições. Deve-se definir também o ambiente de execução, que mapeia identificadores a valores ou localizações de memória, e estabelecer como esse ambiente é modificado durante a execução.
+
+Fase 3: Estruturação da Tabela de Símbolos
+A tabela de símbolos é fundamental para o analisador semântico. É necessário projetar uma estrutura de dados que suporte escopos aninhados, permitindo inserção e busca de símbolos, armazenamento de informações sobre identificadores (tipo, categoria como variável ou função, parâmetros para funções) e gerenciamento adequado da entrada e saída de escopos. Considere usar uma pilha de mapas ou uma estrutura similar que facilite o controle de escopo léxico.
+
+Fase 4: Implementação do Analisador Semântico
+O analisador semântico percorre a árvore sintática abstrata (AST) produzida pelo Happy e realiza as verificações necessárias. Deve-se implementar funções que percorram a AST de forma recursiva, verificando a compatibilidade de tipos em todas as operações e expressões. É preciso garantir que identificadores sejam declarados antes do uso e que não haja declarações duplicadas no mesmo escopo. Para chamadas de função, deve-se validar que o número de argumentos corresponde ao esperado e que os tipos dos argumentos são compatíveis com os parâmetros declarados. Para acesso a registros e arranjos, é necessário verificar que os campos ou índices existem e são válidos.
+
+Fase 5: Tratamento de Erros Semânticos
+Durante a análise semântica, diversos erros podem ser detectados. Deve-se criar um sistema robusto para coletar, reportar e apresentar erros semânticos de forma clara ao usuário. Considere usar mônadas como Either ou Except para propagar erros, ou acumular múltiplos erros usando estruturas como Writer ou validação applicativa. As mensagens de erro devem incluir informações sobre localização no código fonte (linha e coluna) e descrição clara do problema encontrado.
+
+Fase 6: Estruturação do Ambiente de Execução
+Para o interpretador, é necessário definir como os valores serão representados em tempo de execução. Isso inclui criar tipos de dados para representar valores de diferentes tipos (inteiros, booleanos, registros, arranjos, closures para funções), implementar a estrutura do ambiente que mapeia variáveis a valores durante a execução, e definir como o ambiente é manipulado durante chamadas de função e blocos com escopo local.
+
+Fase 7: Implementação do Interpretador
+O interpretador executa programas validados semanticamente. Deve-se implementar funções de avaliação para cada tipo de expressão, retornando valores apropriados, funções de execução para cada tipo de comando (atribuição, condicionais, laços, chamadas de função), e gerenciar adequadamente o ambiente durante a execução. Para funções, é preciso implementar o mecanismo de chamada, incluindo criação de novo escopo, passagem de parâmetros e retorno de valores. O tratamento de entrada e saída também deve ser considerado se a linguagem SL suportar essas operações.
+
+Fase 8: Integração e Testes
+Após implementar o analisador semântico e o interpretador separadamente, é necessário integrá-los com os componentes já existentes (analisador léxico e sintático). Deve-se criar um pipeline que processe código fonte através de todas as fases: análise léxica, análise sintática, análise semântica e interpretação. É fundamental desenvolver casos de teste abrangentes que cubram todas as regras semânticas e construções da linguagem, incluindo testes para casos de erro que devem ser detectados. Também é importante criar programas de teste mais complexos que exercitem múltiplas funcionalidades em conjunto.
+
+Fase 9: Refinamento e Otimização
+Após a implementação básica funcionar, pode-se refinar o código para melhorar mensagens de erro, tornando-as mais informativas e úteis para o programador. Considere otimizar estruturas de dados se houver problemas de desempenho e revisar o código para garantir que segue boas práticas de programação funcional em Haskell. A documentação adequada de funções e módulos também é importante nesta fase.
+
+Considerações Adicionais
+Durante todo o processo, é recomendável manter a modularização clara, separando responsabilidades em módulos distintos (análise de tipos, verificação semântica, interpretação, gerenciamento de ambiente). O uso adequado do sistema de tipos de Haskell pode prevenir muitos erros em tempo de compilação do próprio compilador. Considere também usar abstrações monádicas apropriadas para gerenciar estado, erros e efeitos colaterais de forma elegante e composicional.
+
+\subsection{Google Gemini}
+
+\textbf{Pedro:}
+
+Duvida sobre melhor abordagem para desenvolver o interpretador.
+
+\textbf{Consulta: [Os arquivos Sytanx, interpreter, Basics, ExTC, SmtTC foram enviados para a llm]}
+
+Eu implementei o Syntax e o Interpreter, meu colega implementou o Basics ExpTC e SmtTC da analise semantica.
+Qual é melhor?
+
+1 - Eu adicionar as mudanças que fiz no syntax aos arquivos de semantica e adapatar o interpretador à analise semantica do meu colega (com poucas modificações) para evitar redundancia, ou
+
+2 - Refazer a analise semantica usando oq fiz no interpretador e depois modificar o interpretador para importar a analise semantica e evitar redundancias.
+
+\textbf{Resposta: }
+A Opção 1 é definitivamente a melhor escolha, tanto do ponto de vista da arquitetura de compiladores quanto da dinâmica de trabalho em equipe no desenvolvimento da linguagem SL.
+
+Aqui está uma análise franca do porquê integrar e adaptar o código do seu colega é o caminho ideal, em vez de refazer tudo do zero.
+
+Por que a Opção 1 é a Vencedora?
+Arquitetura Correta (Estático vs. Dinâmico): Atualmente, o seu Interpreter.hs está fazendo o papel de execução e de análise semântica simultaneamente (checagem de tipos em tempo de execução com checkType, validação de aridade, etc.). O código do seu colega (Basics.hs, ExpTC.hs, SmtTC.hs) implementa uma checagem de tipos estática (antes da execução), baseada em um ambiente (Ctx). Esta é a separação de responsabilidades correta para um compilador robusto .
+
+Limpeza do Interpretador: Se você rodar a análise semântica do seu colega antes da interpretação e ela passar sem erros (Right ()), você ganha uma garantia matemática de que o código está tipado corretamente. Isso significa que você pode deletar quase toda a lógica de tratamento de erros de tipo (checkType, validações de tamanho de array, checagem de aridade de funções) do seu Interpreter.hs. Seu interpretador ficará focado apenas na manipulação de estado (IORef) e fluxo de controle, tornando-se muito mais enxuto e rápido.
+
+Aproveitamento da Mônada de Erro: A estrutura que seu colega montou usando Either [SemanticError] a (o tipo Check a) é excelente. Ela permite acumular e reportar múltiplos erros semânticos de uma vez antes do programa rodar, proporcionando uma experiência de usuário muito superior a estourar um error "Type error" no meio da execução.
+
+Duvida sobre a função ReturnCtx.
+
+\textbf{Consulta: [Os arquivos Sytanx, interpreter, Basics, ExTC, SmtTC foram enviados para a llm]}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Pedro consulta.png}
+    \label{fig:placeholder}
+\end{figure}
+
+\textbf{Resposta:}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{res1.png}
+    \label{fig:placeholder}
+\end{figure}
+
+\textbf{Consulta:}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{pc2.png}
+    \label{fig:placeholder}
+\end{figure}
+
+\textbf{Resposta: }
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{pr2.png}
+    \label{fig:placeholder}
+\end{figure}
