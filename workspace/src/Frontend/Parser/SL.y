@@ -85,7 +85,7 @@ import Frontend.Syntax
 %left '*' '/'
 %left NEG   -- ex: -1
 %left '!'
-%left '.' '[' ']'
+%left '.' '[' ']' '(' ')'
 
 %%
 
@@ -265,7 +265,7 @@ LValue :: { Expr }
     | Expr '[' Expr ']'             { $1 :@: $3 }    -- Array Position Access
 
 FuncCall :: { Expr }
-    : id '(' ExprList ')'           { FuncCall (Var $1) $3 }
+    : Expr '(' ExprList ')'           { FuncCall $1 $3 }
 
 ObjCreation :: { Expr }
     : id '{' ExprList '}'           { NewObj $1 $3 }
