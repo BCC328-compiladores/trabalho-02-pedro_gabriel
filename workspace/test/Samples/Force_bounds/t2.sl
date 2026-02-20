@@ -2,7 +2,7 @@
 
 struct Word {
     numChars: int;
-    content: string;
+    word: string;
 }
 
 struct Paragraf {
@@ -11,7 +11,7 @@ struct Paragraf {
 }
 
 struct Page {
-    content: Paragraf[];
+    paragrafs: Paragraf[];
     typePaper: string;
 }
 
@@ -47,16 +47,16 @@ struct Franchise {
 func main(): int{
 
     let Sample_contents: Word[4];
-    Sample_contents[0] = {5, "Magic"};
-    Sample_contents[1] = {2, "is"};
-    Sample_contents[2] = {3, "not"};
-    Sample_contents[3] = {4, "real"};
+    Sample_contents[0] = Word{5, "Magic"};
+    Sample_contents[1] = Word{2, "is"};
+    Sample_contents[2] = Word{3, "not"};
+    Sample_contents[3] = Word{4, "real"};
 
     let Sample_paragfs: Paragraf[1];
-    Sample_paragfs[0] = {Sample_contents, "Arial 12"};
+    Sample_paragfs[0] = Paragraf{Sample_contents, "Arial 12"};
 
     let Sample_pages: Page[1];
-    Sample_pages[0] = {Sample_paragfs, "Yellow paper"};
+    Sample_pages[0] = Page{Sample_paragfs, "Yellow paper"};
 
     let Sample_book: Book[1];
     Sample_book[0] = Book{"ComplacencyOfTheLearned", "Leather", Sample_pages};
@@ -75,8 +75,8 @@ func main(): int{
     BookStoreLispector[0] = BookStore{"Ouro Preto", BookStoreSections};
     BookStoreLispector[1] = BookStore{"Ouro Preto", BookStoreSections};
 
-    let Lispector: Franchise{"Lispector", 10000, BookStoreLispector};
-    printf(Lispector.BookStores[0].Sections[0].Shelves[0].books[0].pages[0].content[0].content[0].content[0]);
+    let Lispector: Franchise = Franchise{"Lispector", 10000, BookStoreLispector};
+    printf(Lispector.BookStores[0].Sections[0].Shelves[0].books[0].pages[0].paragrafs[0].content[0].word[0]);
 
     return 0;
 }

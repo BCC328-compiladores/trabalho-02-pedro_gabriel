@@ -7,6 +7,6 @@ struct test {
 func soma (a: int, b: int) : int { return a + b; }
 
 func main(): int {
-     let t: test = test{soma}
+     let t: test = test{soma};
      return t.f(1, 2);
 }
