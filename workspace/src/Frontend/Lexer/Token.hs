@@ -43,12 +43,15 @@ data Lexeme
     | TkOr                      -- "||"
     | TkNot                     -- "!"
     -- Keywords Lexemes
+    | TkContinue
+    | TkBreak
     | TkStruct
     | TkForAll
     | TkFunc
     | TkLet
     | TkReturn
     | TkPrint
+    | TkScan
     | TkIF
     | TkElif
     | TkElse

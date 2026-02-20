@@ -3,10 +3,14 @@ module Frontend.Parser.SL where
 
 import Frontend.Lexer.Token
 import Frontend.Lexer.SL hiding (lexer)
-import Frontend.Parser.Syntax
+import Frontend.Syntax
 }
 
-%name parseSL
+%name parseSL Main
+%name parseDecl Decl
+%name parseStmt Stmt
+%name parseExpr Expr
+
 %monad {Alex} { (>>=) } { return } 
 %tokentype { Token }
 %error { parseError }
@@ -14,11 +18,14 @@ import Frontend.Parser.Syntax
 
 %token 
     struct      { Token _ TkStruct }
+    continue    { Token _ TkContinue }
+    break       { Token _ TkBreak }
     forall      { Token _ TkForAll }
     func        { Token _ TkFunc }
     let         { Token _ TkLet }
     return      { Token _ TkReturn }
     print       { Token _ TkPrint }
+    scan        { Token _ TkScan }
     if          { Token _ TkIF }
     elif        { Token _ TkElif }
     else        { Token _ TkElse }
@@ -78,7 +85,7 @@ import Frontend.Parser.Syntax
 %left '*' '/'
 %left NEG   -- ex: -1
 %left '!'
-%left '.' '[' ']'
+%left '.' '[' ']' '(' ')'
 
 %%
 
@@ -86,31 +93,31 @@ import Frontend.Parser.Syntax
 Main :: { SL }
     : DeclList { SL $1 }
 
-DeclList :: { [Decl] }
+DeclList :: { [Loc Decl] }
     : Decl DeclList { $1 : $2 }
     |               { [] }
 
-Decl :: { Decl }
+Decl :: { Loc Decl }
     : StructDef { $1 }
     | FuncDef   { $1 }
 
 -- Struct
 
-StructDef :: { Decl }
-    : struct id '{' FieldList '}' { Struct $2 $4 }
+StructDef :: { Loc Decl }
+    : struct id '{' FieldList '}' { Loc (getPos $1) (Struct $2 $4) }
 
-FieldList :: { [Field] }
+FieldList :: { [Loc Field] }
     : FieldDecl FieldList { $1 : $2 }
     |                     { [] }
 
-FieldDecl :: { Field }
-    : id ':' Type ';' { Field $1 $3 }
+FieldDecl :: { Loc Field }
+    : id ':' Type ';' { Loc (getPos $2) (Field $1 $3) }
 
 -- Func
 
-FuncDef :: { Decl }
+FuncDef :: { Loc Decl }
     : GenericsDecl func id '(' ParamList ')' OptReturnType '{' Block '}' 
-      { Func $1 $3 $5 $7 $9 }
+      { Loc (getPos $2) (Func $1 $3 $5 $7 $9) }
 
 GenericsDecl :: { Generics }
     : forall IDList '.' { Generics (Just $2) }
@@ -120,14 +127,14 @@ IDList :: { [ID] }
     : id IDList { $1 : $2 }
     | id        { [$1] }
 
-ParamList :: { [Param] }
+ParamList :: { [Loc Param] }
     : Param ',' ParamList { $1 : $3 }
     | Param               { [$1] }
     |                     { [] }
 
-Param :: { Param }
-    : id ':' Type         { Param $1 (Just $3) }
-    | id                  { Param $1 Nothing }
+Param :: { Loc Param }
+    : id ':' Type         { Loc (getPos $2) (Param $1 (Just $3)) }
+    | id                  { Loc (0, 0) (Param $1 Nothing) }
 
 OptReturnType :: { Maybe Type }
     : ':' Type    { Just $2 }
@@ -138,8 +145,8 @@ OptReturnType :: { Maybe Type }
 Type :: { Type }
     : BaseType                   { $1 }
     | Type '[' ']'               { TyArray $1 Nothing }
-    | Type '[' Expr ']'          { TyArray $1 (Just $3) }
-    | '(' TypeList ')' '->' Type { TyFunc $2 $5 } -- a func can be a First-Class Citizen (This might fuck this project in the next stages)
+    | Type '[' Expr ']'          { TyArray $1 (Just $3)  }
+    | '(' TypeList ')' '->' Type { TyFunc $2 $5 } 
 
 -- BaseType is a helper rule for Array Creation to avoid shift reduce error 
 -- (distinguishes between recursive 'Type[]' and the 'DimList' in 'new int[10]')
@@ -150,7 +157,7 @@ BaseType :: { Type }
     | string                     { TyString }
     | bool                       { TyBool }
     | void                       { TyVoid }
-    | id                         { TyID $1 }
+    | id                         { TyStruct $1 }
 
 TypeList :: { [Type] }
     : Type ',' TypeList { $1 : $3 }
@@ -162,22 +169,25 @@ TypeList :: { [Type] }
 Block :: { Block }
     : StmtList { Block $1 }
 
-StmtList :: { [Stmt] }
+StmtList :: { [Loc Stmt] }
     : Stmt StmtList { $1 : $2 }
     |               { [] }
 
-Stmt :: { Stmt }
+Stmt :: { Loc Stmt }
     -- Create a var
-    : let id ':' Type '=' Expr ';'   { VarDecl $2 (Just $4) (Just $6) }
-    | let id ':' Type ';'            { VarDecl $2 (Just $4) (Nothing) }
-    | let id '=' Expr ';'            { VarDecl $2 (Nothing) (Just $4) }
+    : let id ':' Type '=' Expr ';'   { Loc (getPos $1) (VarDecl $2 (Just $4) (Just $6)) }
+    | let id ':' Type ';'            { Loc (getPos $1) (VarDecl $2 (Just $4) (Nothing)) }
+    | let id '=' Expr ';'            { Loc (getPos $1) (VarDecl $2 (Nothing) (Just $4)) }
 
-    | return OptExpr ';'             { Return $2 } -- return
-    | print '(' Expr ')' ';'         { Print $3 }  -- print
-    | IfStmt                         { $1 }        -- if
+    | return OptExpr ';'             { Loc (getPos $1) (Return $2) } -- return
+    | print '(' Expr ')' ';'         { Loc (getPos $1) (Print $3) }  -- print
+    | scan  '(' Expr ')' ';'         { Loc (getPos $1) (Scan $3) }   -- scan
+    | IfStmt                         { $1 }        -- IfStmt will now return a Loc Stmt
+    | continue ';'                   { Loc (getPos $1) Continue }  
+    | break ';'                      { Loc (getPos $1) Break }
     | WhileStmt                      { $1 }        -- while
     | ForStmt                        { $1 }        -- for 
-    | Expr ';'                       { Exp $1 }    -- isolated expression 
+    | Expr ';'                       { Loc (0, 0) (Exp $1) }    -- Dummy position for isolated Expr. 
 
 -- If has something to return
 OptExpr :: { Maybe Expr }
@@ -186,9 +196,9 @@ OptExpr :: { Maybe Expr }
 
 -- If -> Maybe [Elif] -> Maybe Else
 
-IfStmt :: { Stmt }
+IfStmt :: { Loc Stmt }
     : if '(' Expr ')' '{' Block '}' ElifList OptElse 
-      { IF $3 $6 $8 $9 }
+      { Loc (getPos $1) (IF $3 $6 $8 $9) }
 
 ElifList :: { [(Expr, Block)] }
     : elif '(' Expr ')' '{' Block '}' ElifList  { ($3, $6) : $8 }
@@ -200,13 +210,13 @@ OptElse :: { Maybe Block }
 
 -- While
 
-WhileStmt :: { Stmt }
-    : while '(' Expr ')' '{' Block '}' { While $3 $6 }
+WhileStmt :: { Loc Stmt }
+    : while '(' Expr ')' '{' Block '}' { Loc (getPos $1) (While $3 $6) }
 
 -- For
 
-ForStmt :: { Stmt }
-    : for '(' Expr ';' Expr ';' Expr ')' '{' Block '}' { For $3 $5 $7 $10 }
+ForStmt :: { Loc Stmt }
+    : for '(' Stmt Expr ';' Expr ')' '{' Block '}' { Loc (getPos $1) (For (case $3 of Loc _ s -> s) $4 $6 $9) }
 
 -- Expr
 
@@ -255,7 +265,7 @@ LValue :: { Expr }
     | Expr '[' Expr ']'             { $1 :@: $3 }    -- Array Position Access
 
 FuncCall :: { Expr }
-    : id '(' ExprList ')'           { FuncCall $1 $3 }
+    : Expr '(' ExprList ')'           { FuncCall $1 $3 }
 
 ObjCreation :: { Expr }
     : id '{' ExprList '}'           { NewObj $1 $3 }
@@ -281,6 +291,11 @@ ExprList :: { [Expr] }
     |                   { [] }
 
 {
+
+-- Helper to get the token position
+getPos :: Token -> Pos
+getPos t = case pos t of
+    (l, c) -> (l, c)
 
 -- Error handling function called by Happy when parsing fails.
 parseError :: Token -> Alex a

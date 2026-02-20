@@ -30,12 +30,15 @@ tokens:-
       <state_comment> \n             ;
 
       -- Keywords
+      <0> "continue"                 { simpleToken TkContinue }
+      <0> "break"                    { simpleToken TkBreak }
       <0> "struct"                   { simpleToken TkStruct }
       <0> "forall"                   { simpleToken TkForAll }
       <0> "func"                     { simpleToken TkFunc }
       <0> "let"                      { simpleToken TkLet }
       <0> "return"                   { simpleToken TkReturn }
       <0> "print"                    { simpleToken TkPrint }
+      <0> "scan"                     { simpleToken TkScan }
       <0> "if"                       { simpleToken TkIF }
       <0> "elif"                     { simpleToken TkElif }
       <0> "else"                     { simpleToken TkElse }

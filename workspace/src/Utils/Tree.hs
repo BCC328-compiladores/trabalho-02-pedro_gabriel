@@ -1,6 +1,6 @@
 module Utils.Tree where
 
-import Frontend.Parser.Syntax
+import Frontend.Syntax
 import Data.Tree (Tree(..), drawTree)
 
 
@@ -57,6 +57,12 @@ instance ToTree Stmt where
 
     toTree (Print expr) = Node "Print" [toTree expr]
 
+    toTree (Scan expr) = Node "Scan" [toTree expr]
+
+    toTree Continue = Node "Continue" []
+     
+    toTree Break = Node "Break" []
+
     toTree (IF cond block elifs elseBlock) =
         Node "If" $ [toTree cond, toTree block] ++                    -- If
             map elifToTree elifs ++                                   -- Elif 
@@ -106,7 +112,7 @@ instance ToTree Expr where
     toTree (e :.: id) = Node ("Field (." ++ id ++ ")") [toTree e] -- Struct Field Access
     toTree (e1 :@: e2) = Node "Array ([])" [toTree e1, toTree e2] -- Array Position Access
 
-    toTree (FuncCall id args) = Node ("Call: " ++ id) $ map toTree args
+    toTree (FuncCall expr args) = Node "Call" (toTree expr : map toTree args)
     toTree (NewObj id fields) = Node ("New Obj: " ++ id) $ map toTree fields
     toTree (NewArray type_ dims) = Node "New Array" $ toTree type_ : map toTree dims
 
@@ -118,3 +124,7 @@ instance ToTree Expr where
     
     -- To print (2 + 3) from 1 + (2 + 3)
     toTree (Paren e) = Node "(expr)" [toTree e]
+
+-- To ignore Loc a
+instance ToTree a => ToTree (Loc a) where
+    toTree (Loc _ a) = toTree a

@@ -18,8 +18,8 @@ scanMany input = runAlex input gather
 
 testKeywords :: Test
 testKeywords = TestCase $ do
-    let input = "struct forall func let return print if elif else while for new int float string bool void"
-    let expected = [TkStruct, TkForAll, TkFunc, TkLet, TkReturn, TkPrint, TkIF, TkElif, TkElse, TkWhile, TkFor, TkNew, TkInt, TkFloat , TkString  , TkBool, TkVoid]
+    let input = "continue break struct forall func let return print scan if elif else while for new int float string bool void"
+    let expected = [TkContinue, TkBreak, TkStruct, TkForAll, TkFunc, TkLet, TkReturn, TkPrint, TkScan, TkIF, TkElif, TkElse, TkWhile, TkFor, TkNew, TkInt, TkFloat , TkString  , TkBool, TkVoid]
     case scanMany input of
         Right tokens -> assertEqual "All keywords must be recognized: " expected $ map tokenType tokens
         Left e -> assertFailure e

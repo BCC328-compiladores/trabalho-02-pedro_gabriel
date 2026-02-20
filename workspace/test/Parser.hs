@@ -2,11 +2,15 @@ module Parser where
 
 import Test.HUnit
 import Frontend.Parser.SL (parseSL)
-import Frontend.Parser.Syntax
+import Frontend.Syntax
 import Frontend.Lexer.SL (runAlex)
 
 parse :: String -> Either String SL
 parse input = runAlex input parseSL
+
+-- Helper to inject a Loc dummy into the tests
+l :: a -> Loc a
+l = Loc (0,0)
 
 -- ###############################
 -- Test Decls (Structs / Func)
@@ -17,7 +21,7 @@ parse input = runAlex input parseSL
 testStruct :: Test
 testStruct = TestCase $ do
     let code = "struct Point{x:int;y:float;}"
-    let expected = SL [Struct "Point" [Field "x" TyInt, Field "y" TyFloat]]
+    let expected = SL [l $ Struct "Point" [l $ Field "x" TyInt, l $ Field "y" TyFloat]]
     
     case parse code of
         Left err -> assertFailure err
@@ -28,7 +32,7 @@ testStruct = TestCase $ do
 testFuncSimpleVoid :: Test
 testFuncSimpleVoid = TestCase $ do
     let code = "func main():void{}"
-    let expected = SL [Func (Generics Nothing) "main" [] (Just TyVoid) (Block [])]
+    let expected = SL [l $ Func (Generics Nothing) "main" [] (Just TyVoid) (Block [])]
     
     case parse code of
         Left err -> assertFailure err
@@ -37,8 +41,8 @@ testFuncSimpleVoid = TestCase $ do
 testFuncTypedNoReturn :: Test
 testFuncTypedNoReturn = TestCase $ do
     let code = "func add(a:int,b:float){}"
-    let params = [Param "a" (Just TyInt), Param "b" (Just TyFloat)]
-    let expected = SL [Func (Generics Nothing) "add" params Nothing (Block [])]
+    let params = [l $ Param "a" (Just TyInt), l $ Param "b" (Just TyFloat)]
+    let expected = SL [l $ Func (Generics Nothing) "add" params Nothing (Block [])]
     
     case parse code of
         Left err -> assertFailure err
@@ -49,10 +53,11 @@ testFuncGenerics = TestCase $ do
     let code = "forall T . func generic(x:(T)->T):T{}"
     
     let gen = Generics (Just ["T"])
-    let params = [Param "x" $ Just $ TyFunc [TyID "T"] $ TyID "T"]
-    let ret = Just (TyID "T")
+    let tType = TyStruct "T" 
+    let params = [l $ Param "x" $ Just $ TyFunc [tType] tType]
+    let ret = Just tType
     
-    let expected = SL [Func gen "generic" params ret (Block [])]
+    let expected = SL [l $ Func gen "generic" params ret (Block [])]
     
     case parse code of
         Left err -> assertFailure err
@@ -62,8 +67,8 @@ testFuncInferredParams :: Test
 testFuncInferredParams = TestCase $ do
     let code = "func map(x, y) {}"
 
-    let params = [Param "x" Nothing, Param "y" Nothing]
-    let expected = SL [Func (Generics Nothing) "map" params Nothing (Block [])]
+    let params = [l $ Param "x" Nothing, l $ Param "y" Nothing]
+    let expected = SL [l $ Func (Generics Nothing) "map" params Nothing (Block [])]
     
     case parse code of
         Left err -> assertFailure err
@@ -73,10 +78,10 @@ testFuncWithBody :: Test
 testFuncWithBody = TestCase $ do
     let code = "func main(){print(1);return;}"
     
-    let body = [ Print (LitInt 1)
-               , Return Nothing 
+    let body = [ l $ Print (LitInt 1)
+               , l $ Return Nothing 
                ]
-    let expected = SL [Func (Generics Nothing) "main" [] Nothing (Block body)]
+    let expected = SL [l $ Func (Generics Nothing) "main" [] Nothing (Block body)]
     
     case parse code of
         Left err -> assertFailure err
@@ -97,11 +102,11 @@ declTests = TestList [
 -- ###############################
 
 -- Stmt Helper: wrap the stmt inside a 'func main() { expr; }' to use the main parser, and parse a single stmt
-parseStmt :: String -> Either String [Stmt]
+parseStmt :: String -> Either String [Loc Stmt]
 parseStmt bodyCode = 
     let fullCode = "func main() { " ++ bodyCode ++ " }"
     in case runAlex fullCode parseSL of
-        Right (SL [Func _ _ _ _ (Block stmts)]) -> Right stmts
+        Right (SL [Loc _ (Func _ _ _ _ (Block stmts))]) -> Right stmts
         Right _ -> Left "Unexpected structure (not a main function)"
         Left err -> Left err
 
@@ -110,15 +115,15 @@ testVarDecl :: Test
 testVarDecl = TestCase $ do
     -- Type and Value
     let code1 = "let x: int = 10;"
-    let exp1  = [VarDecl "x" (Just TyInt) (Just (LitInt 10))]
+    let exp1  = [l $ VarDecl "x" (Just TyInt) (Just (LitInt 10))]
     
     -- Type Only
     let code2 = "let y : float;"
-    let exp2  = [VarDecl "y" (Just TyFloat) Nothing]
+    let exp2  = [l $ VarDecl "y" (Just TyFloat) Nothing]
     
     -- Inference
     let code3 = "let z = true;"
-    let exp3  = [VarDecl "z" Nothing (Just (LitBool True))]
+    let exp3  = [l $ VarDecl "z" Nothing (Just (LitBool True))]
 
     case (parseStmt code1, parseStmt code2, parseStmt code3) of
         (Right r1, Right r2, Right r3) -> do
@@ -135,14 +140,14 @@ testIfElse = TestCase $ do
     let code = "if (x > 0) { print(1); } elif (x < 0) { print(2); } else { print(0); }"
     
     let condIf   = Var "x" :>: LitInt 0
-    let blockIf  = Block [Print (LitInt 1)]
+    let blockIf  = Block [l $ Print (LitInt 1)]
     
     let condElif = Var "x" :<: LitInt 0
-    let blockElif = Block [Print (LitInt 2)]
+    let blockElif = Block [l $ Print (LitInt 2)]
     
-    let blockElse = Just (Block [Print (LitInt 0)])
+    let blockElse = Just (Block [l $ Print (LitInt 0)])
     
-    let expected = [IF condIf blockIf [(condElif, blockElif)] blockElse]
+    let expected = [l $ IF condIf blockIf [(condElif, blockElif)] blockElse]
     
     case parseStmt code of
         Right res -> assertEqual "If-Elif-Else Parsing" expected res
@@ -152,16 +157,16 @@ testIfElse = TestCase $ do
 testLoops :: Test
 testLoops = TestCase $ do
     -- While
-    let codeWhile = "while(true) { x++; }"
-    let expWhile  = [While (LitBool True) (Block [Exp (PostInc (Var "x"))])]
+    let codeWhile = "while(true) { x++; break; }"
+    let expWhile  = [l $ While (LitBool True) (Block [l $ Exp (PostInc (Var "x")), l Break])]
     
     -- For
-    let codeFor   = "for(i=0; i<10; i++) { print(i); }"
-    let init      = Var "i" := LitInt 0
+    let codeFor   = "for(let i = 0; i<10; i++) { print(i); continue; }"
+    let init      = VarDecl "i" Nothing $ Just $ LitInt 0
     let cond      = Var "i" :<: LitInt 10
     let step      = PostInc (Var "i")
-    let blockFor  = Block [Print (Var "i")]
-    let expFor    = [For init cond step blockFor]
+    let blockFor  = Block [l $ Print (Var "i"), l Continue]
+    let expFor    = [l $ For init cond step blockFor]
 
     case (parseStmt codeWhile, parseStmt codeFor) of
         (Right rW, Right rF) -> do
@@ -169,20 +174,24 @@ testLoops = TestCase $ do
             assertEqual "For Parsing"   expFor   rF
         err -> assertFailure $ "Error in Loops: " ++ show err
 
--- Return, Print, Exp
+-- Return, Print, Scan, Exp
 testOthers :: Test
 testOthers = TestCase $ do
     -- Return empty and with value
     let codeRet = "return; return 5;"
-    let expRet  = [Return Nothing, Return (Just (LitInt 5))]
+    let expRet  = [l $ Return Nothing, l $ Return (Just (LitInt 5))]
     
     -- Print
     let codePrint = "print(\"Hello\");"
-    let expPrint  = [Print (LitString "Hello")]
+    let expPrint  = [l $ Print (LitString "Hello")]
+    
+    -- Scan
+    let codeScan = "scan(a);"
+    let expScan  = [l $ Scan (Var "a")]
     
     -- Isolated Exp (Function call)
     let codeExp = "doSomething();"
-    let expExp  = [Exp (FuncCall "doSomething" [])]
+    let expExp  = [l $ Exp (FuncCall (Var "doSomething") [])]
 
     case parseStmt (codeRet ++ codePrint ++ codeExp) of
         Right stmts -> assertEqual "Other Stmts" (expRet ++ expPrint ++ expExp) stmts
@@ -207,7 +216,7 @@ parseExpr exprCode =
     let fullCode = "func main() { " ++ exprCode ++ "; }"
     in case runAlex fullCode parseSL of
         -- Extracts the expression inside the block -> Exp expr
-        Right (SL [Func _ _ _ _ (Block [Exp e])]) -> Right e
+        Right (SL [Loc _ (Func _ _ _ _ (Block [Loc _ (Exp e)]))]) -> Right e
         Right _ -> Left "Unexpected structure (not a main function with one expr)"
         Left err -> Left err
 
@@ -282,7 +291,7 @@ testCreations :: Test
 testCreations = TestCase $ do
     -- Function Call
     let codeCall = "sum(a, 10)"
-    let expCall  = FuncCall "sum" [Var "a", LitInt 10]
+    let expCall  = FuncCall (Var "sum") [Var "a", LitInt 10]
 
     -- Object Creation
     let codeObj  = "Point { 10, 20 }"
