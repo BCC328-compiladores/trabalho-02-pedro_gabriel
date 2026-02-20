@@ -15,7 +15,7 @@ library
         Frontend.Semantics.Basics
         Frontend.Semantics.ExprTC
         Frontend.Semantics.StmtTC
-        -- Interpreter
+        Interpreter
         Utils.Tree
         Utils.Pretty
 
@@ -46,6 +46,8 @@ executable sl
         , sl-lang
         , filepath
         , process
+        , containers
+        , haskeline
     
     hs-source-dirs:      app
 

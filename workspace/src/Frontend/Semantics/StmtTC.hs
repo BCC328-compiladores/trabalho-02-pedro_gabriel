@@ -43,15 +43,21 @@ registerDecl ctx (Loc pos (Func (Generics gens) fname params mRetTy _)) = do
             if fname == "main" && (not (null params) || isJust gens)
                 then invalidMain c "The 'main' function cannot have parameters or generics."
                 else do
-                    let paramTys = [ fromMaybe (TyVar pid) mTy | Loc _ (Param pid mTy) <- params ]
-                        retTy = case mRetTy of
+                    -- Get generics list
+                    let genList = fromMaybe [] gens
+                    let rawParamTys = [ fromMaybe (TyVar pid) mTy | Loc _ (Param pid mTy) <- params ]
+                        rawRetTy = case mRetTy of
                                   Just t  -> t
                                   Nothing -> case params of
                                       -- If the first parameter has no type, the return value is itself (Identity Polymorphism).
                                       (Loc _ (Param pid Nothing) : _) -> TyVar pid
                                       -- Otherwise (typed or empty parameters), it is Void.
-                                      _ -> TyVoid                        
-                        sig         = (paramTys, retTy) 
+                                      _ -> TyVoid
+                    -- Apply the conversion of fake Structs to real TyVars.
+                    let paramTys = map (replaceGenerics genList) rawParamTys
+                        retTy = replaceGenerics genList rawRetTy
+
+                    let sig         = (paramTys, retTy) 
                         newFuncCtx  = M.insert fname sig (funcCtx c)
                         funcType    = TyFunc paramTys retTy
                         newVarCtx   = M.insert fname funcType (varCtx c)
@@ -66,9 +72,10 @@ tychDecl ctx (Loc pos (Struct sname fields)) = do
     mapM_ (tychField c sname) fields
 
 -- Function
-tychDecl ctx (Loc pos (Func (Generics _) fname params mRetTy body)) = do
+tychDecl ctx (Loc pos (Func (Generics gens) fname params mRetTy body)) = do
     -- Building internal context
-    let c = ctx { currentPos = pos }
+    let genList = fromMaybe [] gens
+    let c = ctx { currentPos = pos, genericsCtx = genList }
     -- Search for the type of return recorded
     retTy <- case M.lookup fname (funcCtx c) of
                 Just (_, r) -> Right r
@@ -98,7 +105,8 @@ buildParamCtx :: Ctx -> [Loc Param] -> Check Ctx
 buildParamCtx ctx [] = Right ctx
 buildParamCtx ctx (Loc pos (Param pid mTy) : ps) = do
     let c = ctx { currentPos = pos }
-    let ty = fromMaybe (TyVar pid) mTy 
+    let rawTy = fromMaybe (TyVar pid) mTy
+    let ty = replaceGenerics (genericsCtx c) rawTy 
     let newVarCtx = M.insert pid ty (varCtx c)
     buildParamCtx (c { varCtx = newVarCtx }) ps
 
@@ -120,7 +128,9 @@ tychStmt ctx (Loc pos stmtCore) = do
     case stmtCore of
         -- Var declaretion
         VarDecl vid mTy mInit ->
-            case (mTy, mInit) of
+            -- Apply the conversion using the generics of the current context
+            let realTy = fmap (replaceGenerics (genericsCtx c)) mTy
+             in case (mTy, mInit) of
                 (Just ty, Just initExpr) -> do
                     ti <- tychExpr c initExpr
                     _ <- checkAssign c ty ti
