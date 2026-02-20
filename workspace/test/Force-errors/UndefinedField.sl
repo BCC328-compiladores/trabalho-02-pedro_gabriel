@@ -1,8 +1,8 @@
 // Campo z não existe dentro da Estrutura Position
 
 struct Position {
-    x: Int; 
-    y: Int;
+    x: int; 
+    y: int;
 }
 
 func main() : int {

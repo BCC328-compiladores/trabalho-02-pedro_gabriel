@@ -4,5 +4,5 @@ func main() : int {
     let x : int;
     let x : string;
 
-    return x
+    return x;
 }

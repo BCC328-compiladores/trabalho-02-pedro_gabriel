@@ -1,8 +1,8 @@
 // A variável x não é uma estrutura
 
 struct Position {
-    x: Int; 
-    y: Int;
+    x: int; 
+    y: int;
 }
 
 func main() : int {
